@@ -1,0 +1,38 @@
+C:\mbw\results\A16_411.txt
+RUN INFORMATION:
+================
+Counting protocol no: 16                                  Wed 18-Dec-2019  4:01
+Name: COPY_OF_H-3_KORTYZOL_5_MIN
+CPM normalization protocol no:  2
+
+
+COLUMNS:
+========
+ 	SAMPLE	POS	CCPM1	CCPM1%	
+ 	Unk_1	A01	0	0.0	
+ 	Unk_2	A02	17672	8.5	
+ 	Unk_3	A03	18371	8.9	
+ 	Unk_4	A04	16021	2.6	
+ 	Unk_13	C01	0	0.0	
+ 	Unk_14	C02	113	111.3	
+ 	Unk_15	C03	95	130.9	
+ 	Unk_16	C04	34	64.9	
+
+PLATES:
+=======
+Plate 1
+Cassette information:
+Assay:-/Prot:16/Cass:16/Func:-/Cassette no:   1/Shelf: 1/4*6
+
+
+CCPM1
+
+ 	1	2	3	4	5	6	
+A	0	17672	18371	16021	-	-	
+B	-	-	-	-	-	-	
+C	0	113	95	34	-	-	
+D	-	-	-	-	-	-	
+
+End of plate 1
+Total count rate:    52306.5 CCPM
+END
