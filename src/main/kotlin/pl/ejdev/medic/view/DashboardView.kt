@@ -12,6 +12,7 @@ import org.koin.java.KoinJavaComponent.inject
 import pl.ejdev.medic.components.Extension
 import pl.ejdev.medic.components.samplesTable
 import pl.ejdev.medic.components.uploadFileButton
+import pl.ejdev.medic.controller.MainController
 import pl.ejdev.medic.controller.SamplesController
 import pl.ejdev.medic.model.RunInformation
 import pl.ejdev.medic.service.XslxService
@@ -23,6 +24,7 @@ private const val TITLE = "Medic"
 private const val UPLOAD = "Upload"
 
 fun dashboardView() = stackPane {
+    val mainController: MainController by inject(MainController::class.java)
     val samplesController: SamplesController by inject(SamplesController::class.java)
     val xslxService: XslxService by inject(XslxService::class.java)
 
@@ -71,7 +73,8 @@ fun dashboardView() = stackPane {
 
 
                     xslxService.generate(
-                        sampleData
+                        mainController.primaryStage()
+//                        sampleData
 //                        runInfo = runInfo!!,
 //                        samples = samplesController.samples.map { it },
 //                        plates = samplesController.plates.map { it },

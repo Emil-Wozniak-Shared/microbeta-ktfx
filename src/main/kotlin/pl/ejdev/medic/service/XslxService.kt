@@ -1,22 +1,23 @@
 package pl.ejdev.medic.service
 
+import javafx.stage.Stage
+import ktfx.layouts.label
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Sheet
-import org.apache.poi.xssf.usermodel.XSSFWorkbook
+import pl.ejdev.medic.components.dialog
 import pl.ejdev.medic.utils.SheetBuilder
 import pl.ejdev.medic.utils.Type.F
 import pl.ejdev.medic.utils.Type.V
 import pl.ejdev.medic.utils.excel
 import java.io.File
-import java.io.FileOutputStream
-
 
 private const val WYDRUK = "Wydruk"
 private const val VALUES_SHEET = "Mel8V09"
 
 class XslxService {
     fun generate(
+        owner: Stage,
         hormone: String = "Kortyzol",
         date: String = "2019-01-08 00:00:00",
         subject: String = "Owce",
@@ -76,36 +77,41 @@ class XslxService {
             listOf("41", "10", "249", "7")
         )
     ) {
-        val workbook = XSSFWorkbook()
-
-        excel("file.xml") {
-            sheet(WYDRUK) {
-                wydrukRows()
-            }
-            sheet(VALUES_SHEET) {
-                valuesRows(hormone, date, subject, initialData, standardPoints, cpmData)
-            }
-        }
-
-        // Create sheets
-        val wydrukSheet = workbook.createSheet(WYDRUK)
-        val mel8V09Sheet = workbook.createSheet(VALUES_SHEET)
-
-        // Build Mel8V09 sheet
-        buildMel8V09Sheet(mel8V09Sheet)
-        // Build Wydruk sheet
-        wydrukSheet.buildWydruk()
-
-        // Auto-size columns for better readability
-        (0..10).forEach { wydrukSheet.autoSizeColumn(it) }
-        (0..34).forEach { mel8V09Sheet.autoSizeColumn(it) }
-
         val fileName = "file.xlsx"
         val userHome = System.getProperty("user.home")
         val outputFile = File(userHome, fileName)
-        FileOutputStream(outputFile).use {
-            workbook.write(it)
+        runCatching {
+            excel(outputFile.path) {
+                sheet(WYDRUK) { wydrukRows() }
+                sheet(VALUES_SHEET) { valuesRows(hormone, date, subject, initialData, standardPoints, cpmData) }
+            }
+        }.onFailure { e ->
+            dialog(owner, "Create XLSX failed!") {
+                label("${e.message}") {}
+            }
+            throw e
+        }.onSuccess {
+            dialog(owner, "Saved") {
+                label("File saved: ${outputFile.path}") {}
+            }
         }
+
+
+        // Create sheets
+//        val wydrukSheet = workbook.createSheet(WYDRUK)
+//        val mel8V09Sheet = workbook.createSheet(VALUES_SHEET)
+//
+//        // Build Mel8V09 sheet
+//        buildMel8V09Sheet(mel8V09Sheet)
+//        // Build Wydruk sheet
+//        wydrukSheet.buildWydruk()
+//
+//        // Auto-size columns for better readability
+//        (0..10).forEach { wydrukSheet.autoSizeColumn(it) }
+//        (0..34).forEach { mel8V09Sheet.autoSizeColumn(it) }
+//        FileOutputStream(outputFile).use {
+//            workbook.write(it)
+//        }
     }
 
     private fun SheetBuilder.valuesRows(
@@ -195,7 +201,7 @@ class XslxService {
                 // Column A - Tube numbers (continuing from previous)
                 if (i == 44) row["25"] else row[0, "A${i}+1", F]
                 // Column B - CPM values
-                if (i - 44 < cpmData.size) row[1, cpmData[i - 44].toDouble(), F]
+                if (i - 44 < cpmData.size) row[1, cpmData[i - 44].toDouble(), V]
                 // Column C - Cortisol concentration formula
                 row[2, "10^((LOG((B$rowIndex-\$I\$16)*100/\$J\$18/(100-(B$rowIndex-\$I\$16)*100/\$J\$18))-\$R\$19)/\$R\$20)", F]
                 // Column D - Dilution factor
@@ -232,7 +238,7 @@ class XslxService {
         this[16]["Mel8V09!A43", F]["Uwagi", V]["Mel8V09!C43", F]["Opis próby"]["Mel8V09!F43", F]["Mel8V09!G43", F]
         (17..405).forEach { rowNum ->
             this[rowNum].also { row ->
-                row[0, if (rowNum <= 404) "Mel8V09!A${rowNum + 26}" else "", F][2, if (rowNum <= 404) "Mel8V09!C${rowNum + 26}" else "", F][6, "MOD(ROW(),2)", F]
+                row[0, if (rowNum <= 404) "Mel8V09!A${rowNum + 26}" else "", V][2, if (rowNum <= 404) "Mel8V09!C${rowNum + 26}" else "", V][6, "MOD(ROW(),2)", F]
                 when (rowNum) {
                     in (17..403 step 2) -> {
                         // Column E - formulas and values

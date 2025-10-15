@@ -60,24 +60,58 @@ dependencies {
     implementation("com.hanggrian.ktfx:ktfx-jfoenix:0.3")
 
     implementation("org.apache.poi:poi:5.2.3")
-    implementation("org.apache.poi:poi-ooxml:5.2.3")
+    implementation("org.apache.poi:poi-ooxml:5.4.0")
     implementation("org.apache.xmlbeans:xmlbeans:5.1.1")
-    implementation("org.apache.commons:commons-compress:1.21")
-    implementation("commons-io:commons-io:2.11.0")
+    implementation("org.apache.commons:commons-compress:1.26.0")
+    implementation("commons-io:commons-io:2.14.0")
 
     implementation("io.insert-koin:koin-core:3.5.3")
 
+    // --- Testing ---
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation("org.testfx:testfx-core:4.0.18")
+    testImplementation("org.testfx:testfx-junit5:4.0.18")
+    testImplementation("org.hamcrest:hamcrest:3.0")
 }
 
 tasks.withType<Test> {
     useJUnitPlatform()
+
+    jvmArgs(
+        // Open your module to TestFX
+        "--add-opens", "pl.ejdev.medic/pl.ejdev.medic=org.testfx.junit5",
+        "--add-opens", "pl.ejdev.medic/pl.ejdev.medic=ALL-UNNAMED",
+
+        // OPEN to org.testfx module specifically (for reflection)
+        "--add-opens", "javafx.graphics/com.sun.javafx.application=org.testfx",
+        "--add-opens", "javafx.graphics/com.sun.glass.ui=org.testfx",
+
+        // Export to org.testfx module
+        "--add-exports", "javafx.graphics/com.sun.javafx.application=org.testfx",
+        "--add-exports", "javafx.graphics/com.sun.glass.ui=org.testfx",
+
+        // Open and export to ALL-UNNAMED as well
+        "--add-opens", "javafx.graphics/com.sun.javafx.application=ALL-UNNAMED",
+        "--add-opens", "javafx.graphics/com.sun.glass.ui=ALL-UNNAMED",
+        "--add-exports", "javafx.graphics/com.sun.javafx.application=ALL-UNNAMED",
+        "--add-exports", "javafx.graphics/com.sun.glass.ui=ALL-UNNAMED",
+
+        // Additional opens for other JavaFX internals
+        "--add-opens", "javafx.controls/com.sun.javafx.scene.control=ALL-UNNAMED",
+        "--add-opens", "javafx.graphics/com.sun.javafx.stage=ALL-UNNAMED",
+        "--add-opens", "javafx.graphics/com.sun.javafx.tk=ALL-UNNAMED"
+    )
+    // Optional: show detailed test logs
+    testLogging {
+        events("passed", "skipped", "failed")
+    }
 }
 
 jlink {
     addExtraModulePath("pl.ejdev.merged.module")
-    addExtraModulePath( "kotlin.stdlib")
+    addExtraModulePath("kotlin.stdlib")
     imageZip.set(layout.buildDirectory.file("/distributions/app-${javafx.platform.classifier}.zip"))
     options.set(listOf("--strip-debug", "--compress", "2", "--no-header-files", "--no-man-pages"))
     launcher {
