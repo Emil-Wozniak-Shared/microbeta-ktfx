@@ -8,11 +8,11 @@ import org.testfx.api.FxRobotInterface
 
 typealias Selector = String
 
-inline fun <reified T : Control> Selector.verify(crossinline check: T.() -> Boolean) {
+inline fun <reified T : Node> Selector.verify(crossinline check: T.() -> Boolean) {
     verifyThat<T>(this) { check(it) }
 }
 
-inline fun <reified T : Control> T.verify(crossinline check: T.() -> Boolean) {
+inline fun <reified T : Node> T.verify(crossinline check: T.() -> Boolean) {
     verifyThat<T>(this) { check(it) }
 }
 

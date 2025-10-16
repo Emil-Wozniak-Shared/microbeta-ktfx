@@ -83,6 +83,8 @@ tasks.withType<Test> {
         // Open your module to TestFX
         "--add-opens", "pl.ejdev.medic/pl.ejdev.medic=org.testfx.junit5",
         "--add-opens", "pl.ejdev.medic/pl.ejdev.medic=ALL-UNNAMED",
+        "--add-opens", "pl.ejdev.medic/pl.ejdev.medic.components=org.testfx.junit5",
+        "--add-opens", "pl.ejdev.medic/pl.ejdev.medic.components=ALL-UNNAMED",
 
         // OPEN to org.testfx module specifically (for reflection)
         "--add-opens", "javafx.graphics/com.sun.javafx.application=org.testfx",

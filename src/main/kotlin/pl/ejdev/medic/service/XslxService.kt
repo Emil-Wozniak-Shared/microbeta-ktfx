@@ -15,6 +15,7 @@ import java.io.File
 private const val WYDRUK = "Wydruk"
 private const val VALUES_SHEET = "Mel8V09"
 
+@Suppress("LocalVariableName")
 class XslxService {
     fun generate(
         owner: Stage,
@@ -22,27 +23,27 @@ class XslxService {
         date: String = "2019-01-08 00:00:00",
         subject: String = "Owce",
         initialData: List<List<String>> = listOf(
-            listOf("1", "Total", "1976"),
-            listOf("2", "Total", "1982"),
-            listOf("3", "Bg", "32"),
-            listOf("4", "Bg", "36"),
-            listOf("5", "Bo", "458"),
-            listOf("6", "Bo", "459"),
-            listOf("7", "Bo", "447"),
-            listOf("8", "1.25", "412"),
-            listOf("9", "1.25", "390"),
-            listOf("10", "2.5", "378"),
-            listOf("11", "2.5", "352"),
-            listOf("12", "5", "322"),
-            listOf("13", "5", "316"),
-            listOf("14", "10", "225"),
-            listOf("15", "10", "249"),
-            listOf("16", "20", "165"),
-            listOf("17", "20", "174"),
-            listOf("18", "40", "102"),
-            listOf("19", "40", "116"),
-            listOf("20", "80", "74"),
-            listOf("21", "80", "65")
+            listOf("Total", "1976"),
+            listOf("Total", "1982"),
+            listOf("Bg", "32"),
+            listOf("Bg", "36"),
+            listOf("Bo", "458"),
+            listOf("Bo", "459"),
+            listOf("Bo", "447"),
+            listOf("1.25", "412"),
+            listOf("1.25", "390"),
+            listOf("2.5", "378"),
+            listOf("2.5", "352"),
+            listOf("5", "322"),
+            listOf("5", "316"),
+            listOf("10", "225"),
+            listOf("10", "249"),
+            listOf("20", "165"),
+            listOf("20", "174"),
+            listOf("40", "102"),
+            listOf("40", "116"),
+            listOf("80", "74"),
+            listOf("80", "65")
         ),
         cpmData: List<Int> = listOf(
             219, 224, 164, 191, 226, 230, 293, 279, 325, 347, 386, 388, 372, 379, 293, 330, 252, 237,
@@ -62,19 +63,19 @@ class XslxService {
         ),
         standardPoints: List<List<String>> = listOf(
             // row, F_col_value, G_col_cpm, point_number
-            listOf("29", "20", "174", "1"),
-            listOf("30", "40", "102", "2"),
-            listOf("31", "40", "116", "2"),
-            listOf("32", "80", "74", "3"),
-            listOf("33", "80", "65", "3"),
-            listOf("34", "1.25", "412", "4"),
-            listOf("35", "1.25", "390", "4"),
-            listOf("36", "2.5", "378", "5"),
-            listOf("37", "2.5", "352", "5"),
-            listOf("38", "5", "322", "6"),
-            listOf("39", "5", "316", "6"),
-            listOf("40", "10", "225", "7"),
-            listOf("41", "10", "249", "7")
+            listOf("1.25", "412", "4"),
+            listOf("1.25", "390", "4"),
+            listOf("2.5", "378", "5"),
+            listOf("2.5", "352", "5"),
+            listOf("5.0", "322", "6"),
+            listOf("5.0", "316", "6"),
+            listOf("10", "225", "7"),
+            listOf("10", "249", "7"),
+            listOf("20", "174", "1"),
+            listOf("40", "102", "2"),
+            listOf("40", "116", "2"),
+            listOf("80", "74", "3"),
+            listOf("80", "65", "3"),
         )
     ) {
         val fileName = "file.xlsx"
@@ -95,23 +96,6 @@ class XslxService {
                 label("File saved: ${outputFile.path}") {}
             }
         }
-
-
-        // Create sheets
-//        val wydrukSheet = workbook.createSheet(WYDRUK)
-//        val mel8V09Sheet = workbook.createSheet(VALUES_SHEET)
-//
-//        // Build Mel8V09 sheet
-//        buildMel8V09Sheet(mel8V09Sheet)
-//        // Build Wydruk sheet
-//        wydrukSheet.buildWydruk()
-//
-//        // Auto-size columns for better readability
-//        (0..10).forEach { wydrukSheet.autoSizeColumn(it) }
-//        (0..34).forEach { mel8V09Sheet.autoSizeColumn(it) }
-//        FileOutputStream(outputFile).use {
-//            workbook.write(it)
-//        }
     }
 
     private fun SheetBuilder.valuesRows(
@@ -129,9 +113,14 @@ class XslxService {
         this[4][2, "Wpisz", V][4, "Mean [cpm]", V][5, "AVERAGE(G14:G15)", F][6, "AVERAGE(G16:G17)", F][7, "AVERAGE(G18:G20)", F][8, "AVERAGE(G23:G24)", F][9, "AVERAGE(G25:G26)", F][10, "AVERAGE(G27:G28)", F][11, "AVERAGE(G29:G30)", F][12, "AVERAGE(G31:G32)", F][13, "AVERAGE(G33:G34)", F][14, "AVERAGE(G35:G36)", F][15, "AVERAGE(G37:G39)", F]
         this[5]["Nr probówki"]["Zawartość"]["cpm"]["N"][5, "COUNT(G14:G15)", F][6, "COUNT(G16:G17)", F][7, "COUNT(G18:G21)", F][8, "COUNT(G23:G24)", F][9, "COUNT(G25:G26)", F][10, "COUNT(G27:G28)", F][11, "COUNT(G29:G30)", F][12, "COUNT(G31:G32)", F][13, "COUNT(G33:G34)", F][14, "COUNT(G35:G36)", F][15, "COUNT(G37:G39)", F]
         // Sample data rows 6-21
-        initialData.forEachIndexed { index, data ->
-            this[6 + index][data[0]][data[1]][data[2].toDouble()]
-        }
+        initialData
+            .filter { it[0] in listOf("TOTAL", "Bg", "Bo") }
+            .forEachIndexed { index, data -> this[6 + index][index + 1][data[1].toInt()] }
+
+        initialData
+            .filter { it[0] !in listOf("TOTAL", "Bg", "Bo") }
+            .forEachIndexed { index, data -> this[16 + index][index + 1][data[1].toInt()] }
+
         // Row 13 - Standard curve headers and initial calculations
         this[6][4, "c.v. [%]", V][5, "STDEV(G14:G15)*100/F5", F][6, "STDEV(G16:G17)*100/G5", F][7, "STDEV(G18:G21)*100/H5", F][8, "STDEV(G23:G24)*100/I5", F][9, "STDEV(G25:G26)*100/J5", F][10, "STDEV(G27:G28)*100/K5", F][11, "STDEV(G29:G30)*100/L5", F][12, "STDEV(G31:G32)*100/M5", F][13, "STDEV(G33:G34)*100/N5", F][14, "STDEV(G35:G36)*100/O5", F][15, "STDEV(G37:G39)*100/P5", F]
         this[7][4, "Diff%Mean", V][5, "G14*100/\$F\$5-100", F][6, "G16*100/\$G\$5-100", F][7, "G18*100/\$H\$5-100", F][8, "G23*100/\$I\$5-100", F][9, "G25*100/\$J\$5-100", F][10, "G27*100/\$K\$5-100", F][11, "G29*100/\$L\$5-100", F][12, "G31*100/\$M\$5-100", F][13, "G33*100/\$N\$5-100", F][14, "G35*100/\$N\$5-100", F][15, "G37*100/\$N\$5-100", F]
@@ -162,38 +151,38 @@ class XslxService {
         // Row 29 - Standard curve point 1 calculations
         this[28][5, "STD", V][6, "(G23-\$I\$16)*100/\$J\$18", F][7, "LOG(F23)", F][8, "LOG(H23/(100-H23))", F][10, "I23", F][11, "J23", F][12, "10^((LOG((G23-\$I\$16)*100/\$J\$18/(100-(G23-\$I\$16)*100/\$J\$18))-\$R\$19)/\$R\$20)", F][13, "1", V][14, "100*STDEV(O25:O26)/AVERAGE(O25:O26)", F][15, "(O25-F23)*100/F23", F][16, "O25/F23", F]
 
+        this[21][5, "STD", V][7, "%Bo-Bg", V][8, "Log(dose)", V][9, "Logit(B-Bg)", V]
         // Continue with standard curve points 2-16 (rows 30-44)
         standardPoints.forEachIndexed { index, point ->
             val (fValue, _, pointNum) = point
-            val rowNum = 28 + index
+            val rowNum = 22 + index
             val excelRowNum = rowNum + 1
+            val dataIndex = 15 + 1
+            val `Bo-Bg` = "J\$18"
+            val `%Bo-Bg` = "(G$excelRowNum-\$I\$$dataIndex)*100/\$${`Bo-Bg`}" // col H
+            val `Log(dose)` = "LOG(F$excelRowNum)" // col I
+            val `Logit(B-Bg)` = "LOG(H$excelRowNum/(100-H$excelRowNum))" // col J
             // Column F - Standard concentration
-            val row = this[rowNum][5, fValue.toDouble(), V]
-
-            when (rowNum) {
-                // Column G - CPM value
-                in (29..41) -> row[6, "G24", F]
-                else -> {}
-            }
+            val row = this[rowNum][5, fValue.toDouble(), V][6, "C$dataIndex", F]
 
             // Column H - %Bo-Bg, I - Log(dose), J - Logit(B-Bg), K - X (logDose), L - Y (logit), M - Odczyt [pg] calculation, N - Punkt nr
-            row[6, "(G$excelRowNum-\$I\$16)*100/\$J\$18", F][7, "LOG(F$excelRowNum)", F][8, "LOG(H$excelRowNum/(100-H$excelRowNum))", F][10, "I$excelRowNum", F][11, "J$excelRowNum", F][12, "10^((LOG((G$excelRowNum-\$I\$16)*100/\$J\$18/(100-(G$excelRowNum-\$I\$16)*100/\$J\$18))-\$R\$19)/\$R\$20)", F][13, pointNum, V]
+            row[4, "A${dataIndex}", F][6, `%Bo-Bg`, F][7, `Log(dose)`, F][8, `Logit(B-Bg)`, F][10, "I$excelRowNum", F][11, "J$excelRowNum", F][12, "10^((LOG((G$excelRowNum-\$I\$16)*100/\$J\$18/(100-(G$excelRowNum-\$I\$16)*100/\$J\$18))-\$R\$19)/\$R\$20)", F][13, pointNum, V]
 
             // Column O - c.v. % (only for first of each duplicate)
             if (pointNum.endsWith("1") || standardPoints.getOrNull(index + 1)?.get(2) != pointNum) {
                 row[14, "100*STDEV(O$excelRowNum:O${excelRowNum + 1})/AVERAGE(O$excelRowNum:O${excelRowNum + 1})", F]
             }
 
-            // Column P - Delta%
-            row[15, "(O$excelRowNum-F$excelRowNum)*100/F$excelRowNum", F]
-
-            // Column Q - ng*N
-            row[16, "O$excelRowNum/F$excelRowNum", F]
+            // Column P, Q - Delta%, ng*N
+            row[15, "(O$excelRowNum-F$excelRowNum)*100/F$excelRowNum", F][16, "O$excelRowNum/F$excelRowNum", F]
         }
 
         // Add the sum formulas
-        this[42][7, "SUMA:", V][8, "SUM(J23:J36)", F]
+        this[36][7, "SUMA:", V][8, "SUM(J23:J36)", F]
 
+
+        this[42]["           "]["Wprowadż"]["     "]["     "]["Wynik"]["Średnia"]
+        this[43]["Nr probówki"]["cpm     "]["ng/ml"]["rozc."]["ng/ml"]["c.v.   "]
         // Create rows 44-404 with CPM data and formulas
         (44..404).forEach { i ->
             val rowIndex = i + 1 // For 1-based indexing in formulas
@@ -201,7 +190,7 @@ class XslxService {
                 // Column A - Tube numbers (continuing from previous)
                 if (i == 44) row["25"] else row[0, "A${i}+1", F]
                 // Column B - CPM values
-                if (i - 44 < cpmData.size) row[1, cpmData[i - 44].toDouble(), V]
+                if (i - 44 < cpmData.size) row[1, cpmData[i - 44], V]
                 // Column C - Cortisol concentration formula
                 row[2, "10^((LOG((B$rowIndex-\$I\$16)*100/\$J\$18/(100-(B$rowIndex-\$I\$16)*100/\$J\$18))-\$R\$19)/\$R\$20)", F]
                 // Column D - Dilution factor

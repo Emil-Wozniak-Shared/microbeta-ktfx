@@ -20,12 +20,12 @@ import java.util.concurrent.TimeUnit.MILLISECONDS
 class ClickableButtonSpec : ApplicationTest() {
     private lateinit var button: Button
 
-    override fun start(stage: Stage) {
+    override fun start(stage: Stage) = stage.run{
         button = Button("click me!")
         button.id = "myButton"
         button.onAction = EventHandler { _ -> button.text = "clicked!" }
-        stage.setScene(Scene(StackPane(button), 100.0, 100.0))
-        stage.show()
+        setScene(Scene(StackPane(button), 100.0, 100.0))
+        show()
     }
 
     @Test
