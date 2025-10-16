@@ -25,8 +25,8 @@ class ExcelBuilder(private val workbook: XSSFWorkbook) {
 data class Input(val value: Any?, val formula: String?)
 
 enum class Type {
-    V, // value
-    F // formula
+    VAL, // value
+    FORM // formula
 }
 
 // Builder for a sheet
@@ -87,15 +87,15 @@ class RowBuilder(private val row: Row) {
 
     operator fun get(index: Int, input: Any, type: Type) = apply {
         when (type) {
-            Type.V -> cell(index, input, null)
-            Type.F -> cell(index, null, input as String)
+            Type.VAL -> cell(index, input, null)
+            Type.FORM -> cell(index, null, input as String)
         }
     }
 
     operator fun get(input: Any, type: Type) = apply {
         when (type) {
-            Type.V -> cell(null, input, null)
-            Type.F -> cell(null, null, input as String)
+            Type.VAL -> cell(null, input, null)
+            Type.FORM -> cell(null, null, input as String)
         }
     }
 
