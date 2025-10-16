@@ -2,6 +2,7 @@ package pl.ejdev.medic.utils
 
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
+import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import java.io.File
 
@@ -30,15 +31,11 @@ enum class Type {
 }
 
 // Builder for a sheet
-class SheetBuilder(private val sheet: org.apache.poi.ss.usermodel.Sheet) {
+class SheetBuilder(private val sheet: Sheet) {
     fun row(index: Int? = null, block: RowBuilder.() -> Unit) {
         val row: Row = if (index != null) sheet.createRow(index) else sheet.createRow(sheet.lastRowNum + 1)
         RowBuilder(row).block()
     }
-
-
-    fun v(value: Any?) = Input(value, null)
-    fun f(formula: String?) = Input(null, formula)
 
     operator fun get(index: Int? = null): RowBuilder {
         var row: Row
@@ -70,12 +67,18 @@ class SheetBuilder(private val sheet: org.apache.poi.ss.usermodel.Sheet) {
 class RowBuilder(private val row: Row) {
     fun cell(index: Int? = null, value: Any?, formula: String?) {
         val cell: Cell =
-            if (index != null) row.createCell(index) else row.createCell(row.lastCellNum.toInt().coerceAtLeast(0))
+            if (index != null) row.createCell(index)
+            else row.createCell(row.lastCellNum.toInt().coerceAtLeast(0))
         if (value != null) {
             when (value) {
                 is String -> cell.setCellValue(value)
                 is Double -> cell.setCellValue(value)
-                is Int -> cell.setCellValue(value.toDouble())
+                is Int -> cell.apply {
+                    val intCellStyle = sheet.workbook.createCellStyle()
+                    intCellStyle.dataFormat = sheet.workbook.createDataFormat().getFormat("0")
+                    cellStyle = intCellStyle
+                    setCellValue(value.toDouble())
+                }
                 is Boolean -> cell.setCellValue(value)
                 else -> cell.setCellValue(value.toString())
             }

@@ -7,6 +7,7 @@ import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Sheet
 import pl.ejdev.medic.components.dialog
 import pl.ejdev.medic.utils.SheetBuilder
+import pl.ejdev.medic.utils.Type
 import pl.ejdev.medic.utils.Type.FORM
 import pl.ejdev.medic.utils.Type.VAL
 import pl.ejdev.medic.utils.excel
@@ -106,55 +107,26 @@ class XslxService {
         this[1][hormone][date][subject]
         this[2][4, "% Bo", VAL][5, "G5*100/\$J$18", FORM][6, "(H5-I16)*100/\$J$18", FORM][7, "(I5-I16)*100/\$J$18", FORM][8, "(J5-I16)*100/\$J$18", FORM][9, "(K5-I16)*100/\$J$18", FORM][10, "(L5-I16)*100/\$J\$18", FORM][11, "(M5-I16)*100/\$J\$18", FORM][12, "(N5-I16)*100/\$J\$18", FORM][13, "(O5-I16)*100/\$J\$18", FORM][15, "J18*100/I14", FORM]
         this[3][4, "% T", VAL][5, "F5*100/\$F\$5", FORM][6, "G5*100/\$F\$5", FORM][7, "(H5-\$I$16)*100/\$F$5", FORM][8, "(I5-\$I\$16)*100/\$F\$5", FORM][9, "(J5-\$I\$16)*100/\$F\$5", FORM][10, "(K5-\$I\$16)*100/\$F\$5", FORM][11, "(L5-\$I\$16)*100/\$F\$5", FORM][12, "(M5-\$I\$16)*100/\$F\$5", FORM][13, "(N5-\$I\$16)*100/\$F\$5", FORM][14, "(O5-\$I\$16)*100/\$F\$5", FORM][15, "(P5-\$I\$16)*100/\$F\$5", FORM]
-        this[4][2, "Wpisz", VAL][4, "Mean [cpm]", VAL][5, "AVERAGE(G14:G15)", FORM][6, "AVERAGE(G16:G17)", FORM][7, "AVERAGE(G18:G20)", FORM][8, "AVERAGE(G23:G24)", FORM][9, "AVERAGE(G25:G26)", FORM][10, "AVERAGE(G27:G28)", FORM][11, "AVERAGE(G29:G30)", FORM][12, "AVERAGE(G31:G32)", FORM][13, "AVERAGE(G33:G34)", FORM][14, "AVERAGE(G35:G36)", FORM][15, "AVERAGE(G37:G39)", FORM]
+        this[4][2, "Wpisz", VAL][4, "Mean [cpm]", VAL][5, "INT(AVERAGE(G14:G15))", FORM][6, "AVERAGE(G16:G17)", FORM][7, "AVERAGE(G18:G20)", FORM][8, "AVERAGE(G23:G24)", FORM][9, "AVERAGE(G25:G26)", FORM][10, "AVERAGE(G27:G28)", FORM][11, "AVERAGE(G29:G30)", FORM][12, "AVERAGE(G31:G32)", FORM][13, "AVERAGE(G33:G34)", FORM][14, "AVERAGE(G35:G36)", FORM][15, "AVERAGE(G37:G39)", FORM]
         this[5]["Nr probówki"]["Zawartość"]["cpm"]["N"][5, "COUNT(G14:G15)", FORM][6, "COUNT(G16:G17)", FORM][7, "COUNT(G18:G21)", FORM][8, "COUNT(G23:G24)", FORM][9, "COUNT(G25:G26)", FORM][10, "COUNT(G27:G28)", FORM][11, "COUNT(G29:G30)", FORM][12, "COUNT(G31:G32)", FORM][13, "COUNT(G33:G34)", FORM][14, "COUNT(G35:G36)", FORM][15, "COUNT(G37:G39)", FORM]
-        // Sample data rows 6-21
+
         initialData
             .filter { it[0] in listOf("Total", "Bg", "Bo") }
             .forEachIndexed { index, data ->
-                val rowNum = 6 + index
-                this@valuesRows.row(rowNum) {
-                    cell(0, index + 1, null)
-                    cell(1, data[0], null)
-                    cell(2, data[1].toInt(), null)
-                }
+                this@valuesRows[6 + index][0, index + 1, VAL][1, data[0], VAL][2, data[1].toInt(), VAL]
             }
-
         initialData
             .filter { it[0] !in listOf("Total", "Bg", "Bo") }
             .forEachIndexed { index, data ->
-                val rowNum = 15 + index
-                this@valuesRows.row(rowNum) {
-                    cell(0, index + 1, null)
-                    cell(1, data[0], null)
-                    cell(2, data[1].toInt(), null)
-                }
+                this@valuesRows[15 + index][0, index + 1, VAL][1, data[0], VAL][2, data[1].toInt(), VAL]
             }
 
-        // Row 13 - Standard curve headers and initial calculations
-        this[6][4, "c.v. [%]", VAL][5, "STDEV(G14:G15)*100/F5", FORM][6, "STDEV(G16:G17)*100/G5", FORM][7, "STDEV(G18:G21)*100/H5", FORM][8, "STDEV(G23:G24)*100/I5", FORM][9, "STDEV(G25:G26)*100/J5", FORM][10, "STDEV(G27:G28)*100/K5", FORM][11, "STDEV(G29:G30)*100/L5", FORM][12, "STDEV(G31:G32)*100/M5", FORM][13, "STDEV(G33:G34)*100/N5", FORM][14, "STDEV(G35:G36)*100/O5", FORM][15, "STDEV(G37:G39)*100/P5", FORM]
-        this[7][4, "Diff%Mean", VAL][5, "G14*100/\$F\$5-100", FORM][6, "G16*100/\$G\$5-100", FORM][7, "G18*100/\$H\$5-100", FORM][8, "G23*100/\$I\$5-100", FORM][9, "G25*100/\$J\$5-100", FORM][10, "G27*100/\$K\$5-100", FORM][11, "G29*100/\$L\$5-100", FORM][12, "G31*100/\$M\$5-100", FORM][13, "G33*100/\$N\$5-100", FORM][14, "G35*100/\$N\$5-100", FORM][15, "G37*100/\$N\$5-100", FORM]
-        this[8][5, "G15*100/\$F\$5-100", FORM][6, "G17*100/\$G\$5-100", FORM][7, "G19*100/\$H\$5-100", FORM][8, "G24*100/\$I\$5-100", FORM][9, "G26*100/\$J\$5-100", FORM][10, "G28*100/\$K\$5-100", FORM][11, "G30*100/\$L\$5-100", FORM][12, "G32*100/\$M\$5-100", FORM][13, "G34*100/\$N\$5-100", FORM][14, "G36*100/\$N\$5-100", FORM][15, "G38*100/\$N\$5-100", FORM]
-        // control curve
-        this[12][4, "Tube No.", VAL][5, "Content", VAL][6, "[cpm]", VAL][7, "Mean; c.v.", VAL][8, "Akceptuj", VAL]
-        this[13][4, "A7", FORM][5, "B7", FORM][6, "C7", FORM][7, "AVERAGE(G14:G15)", FORM][8, "H14", FORM]
-        this[14][4, "A8", FORM][5, "B8", FORM][6, "C8", FORM][7, "STDEV(G14:G15)*100/H14", FORM]
-        this[15][4, "A9", FORM][5, "O", VAL][6, "C9", FORM][7, "AVERAGE(G16:G17)", FORM][8, "H16", FORM][9, "Bo-Bg", VAL]
-        this[16][4, "A10", FORM][5, "O", VAL][6, "C10", FORM][7, "STDEV(G16:G17)*100/H16", FORM][9, "I18-I16", FORM]
-        this[17][4, "A11", FORM][5, "N", VAL][6, "C11", FORM][7, "AVERAGE(G18:G20)", FORM][8, "H18", FORM][9, "I18-I16", FORM]
-        this[18][4, "A12", FORM][5, "N", VAL][6, "C12", FORM][7, "STDEV(G18:G20)*100/H18", FORM]
-        this[19][4, "A13", FORM][5, "N", VAL][6, "C13", FORM]
-
-        // STANDARD CURVE REGRESSION SECTION (Rows 23-40)
+        standarCurveHeadersAndInitialCalc()
+        controlCurve()
         renderStandardCurve()
-        // Continue with standard curve points 2-16 (rows 30-44)
         renderStandardPoints(standardPoints)
-
-        // Add the sum formulas
-        this[36][7, "SUMA:", VAL][8, "SUM(J23:J36)", FORM]
-        this[42]["           "]["Wprowadż"]["     "]["     "]["Wynik"]["Średnia"]
-        this[43]["Nr probówki"]["cpm     "]["ng/ml"]["rozc."]["ng/ml"]["c.v.   "]
-        // Create rows 44-404 with CPM data and formulas
+        sumFormula()
+        dataHeaders()
         renderPoints(cpmData)
     }
 
@@ -166,16 +138,16 @@ class XslxService {
         this[4]["Mel8V09!M17", FORM]["Mel8V09!O17", FORM]
         this[5]["Mel8V09!M18", FORM]["Mel8V09!N18", FORM]["±SD"]
         this[6]["Mel8V09!M19", FORM]["Mel8V09!N19", FORM]["Mel8V09!O19", FORM]
-//        this[7]["Mel8V09!M20", F]["Mel8V09!N20", F]["Mel8V09!O20", F]
-//        this[8]["Mel8V09!M21", F]["Mel8V09!N21", F]
-//        // 9 empty
-//        this[10]["Mel8V09!L44", F]["Mel8V09!N44", F]["Mel8V09!Q44", F]["Mel8V09!R44", F]
-//        this[11]["Mel8V09!L45", F]["Mel8V09!N45", F]["Mel8V09!O45", F]["Mel8V09!P45", F]["Mel8V09!Q45", F]["Mel8V09!R45", F]
-//        this[12]["Mel8V09!L46", F]["Mel8V09!N46", F]["Mel8V09!O46", F]["Mel8V09!P46", F]["Mel8V09!Q46", F]["Mel8V09!R46", F]
-//        this[13]["Mel8V09!L47", F]["Mel8V09!N47", F]["Mel8V09!O47", F]["Mel8V09!P47", F]["Mel8V09!Q47", F]["Mel8V09!R47", F]
+        this[7]["Mel8V09!M20", FORM]["Mel8V09!N20", FORM]["Mel8V09!O20", FORM]
+        this[8]["Mel8V09!M21", FORM]["Mel8V09!N21", FORM]
+        // 9 empty
+        this[10]["Mel8V09!L44", FORM]["Mel8V09!N44", FORM]["Mel8V09!Q44", FORM]["Mel8V09!R44", FORM]
+        this[11]["Mel8V09!L45", FORM]["Mel8V09!N45", FORM]["Mel8V09!O45", FORM]["Mel8V09!P45", FORM]["Mel8V09!Q45", FORM]["Mel8V09!R45", FORM]
+        this[12]["Mel8V09!L46", FORM]["Mel8V09!N46", FORM]["Mel8V09!O46", FORM]["Mel8V09!P46", FORM]["Mel8V09!Q46", FORM]["Mel8V09!R46", FORM]
+        this[13]["Mel8V09!L47", FORM]["Mel8V09!N47", FORM]["Mel8V09!O47", FORM]["Mel8V09!P47", FORM]["Mel8V09!Q47", FORM]["Mel8V09!R47", FORM]
 //        // 14 empty
-//        this[15][2, "Mel8V09!C42", F][4, "Wynik", V]
-//        this[16]["Mel8V09!A43", F]["Uwagi", V]["Mel8V09!C43", F]["Opis próby"]["Mel8V09!F43", F]["Mel8V09!G43", F]
+//        this[15][2, "Mel8V09!C42", FORM][4, "Wynik", V]
+//        this[16]["Mel8V09!A43", FORM]["Uwagi", V]["Mel8V09!C43", FORM]["Opis próby"]["Mel8V09!F43", FORM]["Mel8V09!G43", FORM]
         (17..405).forEach { rowNum ->
             this[rowNum].also { row ->
                 row[0, if (rowNum <= 404) "Mel8V09!A${rowNum + 26}" else "", VAL][2, if (rowNum <= 404) "Mel8V09!C${rowNum + 26}" else "", VAL][6, "MOD(ROW(),2)", FORM]
@@ -902,6 +874,32 @@ class XslxService {
         sumRow.createCell(8).cellFormula = "SUM(J23:J36)"
     }
 
+}
+
+private fun SheetBuilder.dataHeaders() {
+    this[42]["           "]["Wprowadż"]["     "]["     "]["Wynik"]["Średnia"]
+    this[43]["Nr probówki"]["cpm     "]["ng/ml"]["rozc."]["ng/ml"]["c.v.   "]
+}
+
+private fun SheetBuilder.sumFormula() {
+    this[36][7, "SUMA:", VAL][8, "SUM(J23:J36)", FORM]
+}
+
+private fun SheetBuilder.standarCurveHeadersAndInitialCalc() {
+    this[6][4, "c.v. [%]", VAL][5, "STDEV(G14:G15)*100/F5", FORM][6, "STDEV(G16:G17)*100/G5", FORM][7, "STDEV(G18:G21)*100/H5", FORM][8, "STDEV(G23:G24)*100/I5", FORM][9, "STDEV(G25:G26)*100/J5", FORM][10, "STDEV(G27:G28)*100/K5", FORM][11, "STDEV(G29:G30)*100/L5", FORM][12, "STDEV(G31:G32)*100/M5", FORM][13, "STDEV(G33:G34)*100/N5", FORM][14, "STDEV(G35:G36)*100/O5", FORM][15, "STDEV(G37:G39)*100/P5", FORM]
+    this[7][4, "Diff%Mean", VAL][5, "G14*100/\$F\$5-100", FORM][6, "G16*100/\$G\$5-100", FORM][7, "G18*100/\$H\$5-100", FORM][8, "G23*100/\$I\$5-100", FORM][9, "G25*100/\$J\$5-100", FORM][10, "G27*100/\$K\$5-100", FORM][11, "G29*100/\$L\$5-100", FORM][12, "G31*100/\$M\$5-100", FORM][13, "G33*100/\$N\$5-100", FORM][14, "G35*100/\$N\$5-100", FORM][15, "G37*100/\$N\$5-100", FORM]
+    this[8][5, "G15*100/\$F\$5-100", FORM][6, "G17*100/\$G\$5-100", FORM][7, "G19*100/\$H\$5-100", FORM][8, "G24*100/\$I\$5-100", FORM][9, "G26*100/\$J\$5-100", FORM][10, "G28*100/\$K\$5-100", FORM][11, "G30*100/\$L\$5-100", FORM][12, "G32*100/\$M\$5-100", FORM][13, "G34*100/\$N\$5-100", FORM][14, "G36*100/\$N\$5-100", FORM][15, "G38*100/\$N\$5-100", FORM]
+}
+
+private fun SheetBuilder.controlCurve() {
+    this[12][4, "Tube No.", VAL][5, "Content", VAL][6, "[cpm]", VAL][7, "Mean; c.v.", VAL][8, "Akceptuj", VAL]
+    this[13][4, "A7", FORM][5, "B7", FORM][6, "C7", FORM][7, "AVERAGE(G14:G15)", FORM][8, "H14", FORM]
+    this[14][4, "A8", FORM][5, "B8", FORM][6, "C8", FORM][7, "STDEV(G14:G15)*100/H14", FORM]
+    this[15][4, "A9", FORM][5, "O", VAL][6, "C9", FORM][7, "AVERAGE(G16:G17)", FORM][8, "H16", FORM][9, "Bo-Bg", VAL]
+    this[16][4, "A10", FORM][5, "O", VAL][6, "C10", FORM][7, "STDEV(G16:G17)*100/H16", FORM][9, "I18-I16", FORM]
+    this[17][4, "A11", FORM][5, "N", VAL][6, "C11", FORM][7, "AVERAGE(G18:G20)", FORM][8, "H18", FORM][9, "I18-I16", FORM]
+    this[18][4, "A12", FORM][5, "N", VAL][6, "C12", FORM][7, "STDEV(G18:G20)*100/H18", FORM]
+    this[19][4, "A13", FORM][5, "N", VAL][6, "C13", FORM]
 }
 
 private fun SheetBuilder.renderStandardCurve() {
