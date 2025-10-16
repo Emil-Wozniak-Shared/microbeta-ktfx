@@ -46,8 +46,8 @@ fun dashboardView() = stackPane {
                     // Ensure parent directory exists (optional)
                     outputFile.parentFile?.mkdirs()
 
-                    val runInfo = samplesController.runInformation.get()
-                    val sampleData = listOf(
+                    samplesController.runInformation.get()
+                    listOf(
                         listOf("1", "Total", "1976"),
                         listOf("2", "Total", "1982"),
                         listOf("3", "Bg", "32"),
@@ -79,7 +79,7 @@ fun dashboardView() = stackPane {
 //                        samples = samplesController.samples.map { it },
 //                        plates = samplesController.plates.map { it },
                     )
-
+                    this@hbox.addChild(Label("Saved!"))
                     println("Workbook saved")
                 }
             }

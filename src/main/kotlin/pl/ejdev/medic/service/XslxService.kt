@@ -34,8 +34,8 @@ class XslxService {
             listOf("1.25", "390"),
             listOf("2.5", "378"),
             listOf("2.5", "352"),
-            listOf("5", "322"),
-            listOf("5", "316"),
+            listOf("5.0", "322"),
+            listOf("5.0", "316"),
             listOf("10", "225"),
             listOf("10", "249"),
             listOf("20", "165"),
@@ -91,10 +91,6 @@ class XslxService {
                 label("${e.message}") {}
             }
             throw e
-        }.onSuccess {
-            dialog(owner, "Saved") {
-                label("File saved: ${outputFile.path}") {}
-            }
         }
     }
 
@@ -114,12 +110,26 @@ class XslxService {
         this[5]["Nr probówki"]["Zawartość"]["cpm"]["N"][5, "COUNT(G14:G15)", F][6, "COUNT(G16:G17)", F][7, "COUNT(G18:G21)", F][8, "COUNT(G23:G24)", F][9, "COUNT(G25:G26)", F][10, "COUNT(G27:G28)", F][11, "COUNT(G29:G30)", F][12, "COUNT(G31:G32)", F][13, "COUNT(G33:G34)", F][14, "COUNT(G35:G36)", F][15, "COUNT(G37:G39)", F]
         // Sample data rows 6-21
         initialData
-            .filter { it[0] in listOf("TOTAL", "Bg", "Bo") }
-            .forEachIndexed { index, data -> this[6 + index][index + 1][data[1].toInt()] }
+            .filter { it[0] in listOf("Total", "Bg", "Bo") }
+            .forEachIndexed { index, data ->
+                val rowNum = 6 + index
+                this@valuesRows.row(rowNum) {
+                    cell(0, index + 1, null)
+                    cell(1, data[0], null)
+                    cell(2, data[1].toInt(), null)
+                }
+            }
 
         initialData
-            .filter { it[0] !in listOf("TOTAL", "Bg", "Bo") }
-            .forEachIndexed { index, data -> this[16 + index][index + 1][data[1].toInt()] }
+            .filter { it[0] !in listOf("Total", "Bg", "Bo") }
+            .forEachIndexed { index, data ->
+                val rowNum = 15 + index
+                this@valuesRows.row(rowNum) {
+                    cell(0, index + 1, null)
+                    cell(1, data[0], null)
+                    cell(2, data[1].toInt(), null)
+                }
+            }
 
         // Row 13 - Standard curve headers and initial calculations
         this[6][4, "c.v. [%]", V][5, "STDEV(G14:G15)*100/F5", F][6, "STDEV(G16:G17)*100/G5", F][7, "STDEV(G18:G21)*100/H5", F][8, "STDEV(G23:G24)*100/I5", F][9, "STDEV(G25:G26)*100/J5", F][10, "STDEV(G27:G28)*100/K5", F][11, "STDEV(G29:G30)*100/L5", F][12, "STDEV(G31:G32)*100/M5", F][13, "STDEV(G33:G34)*100/N5", F][14, "STDEV(G35:G36)*100/O5", F][15, "STDEV(G37:G39)*100/P5", F]
@@ -136,75 +146,16 @@ class XslxService {
         this[19][4, "A13", F][5, "N", V]
 
         // STANDARD CURVE REGRESSION SECTION (Rows 23-40)
-        // Row 23 - Wzorzec headers and binding calculations
-        this[22][10, "Parametry regresji", V][13, "Y=a+bX", V]
-        // Row 24 - N, SD headers
-        this[23][10, "N", V][12, "SD", V]
-        // Row 25 - N count and b calculation
-        this[24][10, "COUNT(M25:M40)", F][11, "(COUNT(M25:M38)*SUMPRODUCT(M25:M38,N25:N38)-SUM(M25:M38)*SUM(N25:N38))/(COUNT(M25:M38)*SUMSQ(M25:M38)-(SUM(M25:M38))^2)", F][12, "(((COUNT(M25:M40)*SUMSQ(N25:N40)-SUM(N25:N40)^2)/(COUNT(M25:M40)*SUMSQ(M25:M40)-SUM(M25:M40)^2))*(1-N21^2)/(COUNT(M25:M40)-2))^0.5", F]
-        // Row 26 - a calculation
-        this[25][9, "a=", V][10, "SUM(N25:N38)/COUNT(M25:M38)-N19*SUM(M25:M38)/COUNT(M25:M38)", F][11, "(O19^2*SUMSQ(M25:M40)/COUNT(M25:M40))^0.5", F][13, "b=", V][14, "N19", F]
-        // Row 27 - r calculation
-        this[26][9, "r=", V][10, "CORREL(M25:M40,N25:N40)", F][14, "N21", F]
-        // Row 28 - Logit transformation headers
-        this[27][6, "bindingPercent", V][7, "logDose", V][8, "logarithmRealZero", V][11, "logDose", V][12, "logarithmRealZero", V][14, "Logit(B-Bg)", V]
-        // Row 29 - Standard curve point 1 calculations
-        this[28][5, "STD", V][6, "(G23-\$I\$16)*100/\$J\$18", F][7, "LOG(F23)", F][8, "LOG(H23/(100-H23))", F][10, "I23", F][11, "J23", F][12, "10^((LOG((G23-\$I\$16)*100/\$J\$18/(100-(G23-\$I\$16)*100/\$J\$18))-\$R\$19)/\$R\$20)", F][13, "1", V][14, "100*STDEV(O25:O26)/AVERAGE(O25:O26)", F][15, "(O25-F23)*100/F23", F][16, "O25/F23", F]
-
-        this[21][5, "STD", V][7, "%Bo-Bg", V][8, "Log(dose)", V][9, "Logit(B-Bg)", V]
+        renderStandardCurve()
         // Continue with standard curve points 2-16 (rows 30-44)
-        standardPoints.forEachIndexed { index, point ->
-            val (fValue, _, pointNum) = point
-            val rowNum = 22 + index
-            val excelRowNum = rowNum + 1
-            val dataIndex = 15 + 1
-            val `Bo-Bg` = "J\$18"
-            val `%Bo-Bg` = "(G$excelRowNum-\$I\$$dataIndex)*100/\$${`Bo-Bg`}" // col H
-            val `Log(dose)` = "LOG(F$excelRowNum)" // col I
-            val `Logit(B-Bg)` = "LOG(H$excelRowNum/(100-H$excelRowNum))" // col J
-            // Column F - Standard concentration
-            val row = this[rowNum][5, fValue.toDouble(), V][6, "C$dataIndex", F]
-
-            // Column H - %Bo-Bg, I - Log(dose), J - Logit(B-Bg), K - X (logDose), L - Y (logit), M - Odczyt [pg] calculation, N - Punkt nr
-            row[4, "A${dataIndex}", F][6, `%Bo-Bg`, F][7, `Log(dose)`, F][8, `Logit(B-Bg)`, F][10, "I$excelRowNum", F][11, "J$excelRowNum", F][12, "10^((LOG((G$excelRowNum-\$I\$16)*100/\$J\$18/(100-(G$excelRowNum-\$I\$16)*100/\$J\$18))-\$R\$19)/\$R\$20)", F][13, pointNum, V]
-
-            // Column O - c.v. % (only for first of each duplicate)
-            if (pointNum.endsWith("1") || standardPoints.getOrNull(index + 1)?.get(2) != pointNum) {
-                row[14, "100*STDEV(O$excelRowNum:O${excelRowNum + 1})/AVERAGE(O$excelRowNum:O${excelRowNum + 1})", F]
-            }
-
-            // Column P, Q - Delta%, ng*N
-            row[15, "(O$excelRowNum-F$excelRowNum)*100/F$excelRowNum", F][16, "O$excelRowNum/F$excelRowNum", F]
-        }
+        renderStandardPoints(standardPoints)
 
         // Add the sum formulas
         this[36][7, "SUMA:", V][8, "SUM(J23:J36)", F]
-
-
         this[42]["           "]["Wprowadż"]["     "]["     "]["Wynik"]["Średnia"]
         this[43]["Nr probówki"]["cpm     "]["ng/ml"]["rozc."]["ng/ml"]["c.v.   "]
         // Create rows 44-404 with CPM data and formulas
-        (44..404).forEach { i ->
-            val rowIndex = i + 1 // For 1-based indexing in formulas
-            this[i].also { row ->
-                // Column A - Tube numbers (continuing from previous)
-                if (i == 44) row["25"] else row[0, "A${i}+1", F]
-                // Column B - CPM values
-                if (i - 44 < cpmData.size) row[1, cpmData[i - 44], V]
-                // Column C - Cortisol concentration formula
-                row[2, "10^((LOG((B$rowIndex-\$I\$16)*100/\$J\$18/(100-(B$rowIndex-\$I\$16)*100/\$J\$18))-\$R\$19)/\$R\$20)", F]
-                // Column D - Dilution factor
-                row[3, if (i == 44) 1.0 else "D${i}", if (i == 44) V else F]
-                // Column E - Result (concentration * dilution)
-                row[4, "C$rowIndex*D$rowIndex", F]
-                when (i) {
-                    // Column F, G, H - Average (for duplicate samples), Coefficient of variation,  Sample identifiers
-                    in (44..404 step 2) -> row[5, "AVERAGE(E${i}:E${i + 1})", F][6, "100*STDEV(E${i}:E${i + 1})/F$rowIndex", F][7, i - 43, V]
-                    // Column H - Sample identifiers
-                    in (45..403 step 2) -> row[7, i - 43, V]
-                }
-            }
-        }
+        renderPoints(cpmData)
     }
 
     private fun SheetBuilder.wydrukRows() {
@@ -215,16 +166,16 @@ class XslxService {
         this[4]["Mel8V09!M17", F]["Mel8V09!O17", F]
         this[5]["Mel8V09!M18", F]["Mel8V09!N18", F]["±SD"]
         this[6]["Mel8V09!M19", F]["Mel8V09!N19", F]["Mel8V09!O19", F]
-        this[7]["Mel8V09!M20", F]["Mel8V09!N20", F]["Mel8V09!O20", F]
-        this[8]["Mel8V09!M21", F]["Mel8V09!N21", F]
-        // 9 empty
-        this[10]["Mel8V09!L44", F]["Mel8V09!N44", F]["Mel8V09!Q44", F]["Mel8V09!R44", F]
-        this[11]["Mel8V09!L45", F]["Mel8V09!N45", F]["Mel8V09!O45", F]["Mel8V09!P45", F]["Mel8V09!Q45", F]["Mel8V09!R45", F]
-        this[12]["Mel8V09!L46", F]["Mel8V09!N46", F]["Mel8V09!O46", F]["Mel8V09!P46", F]["Mel8V09!Q46", F]["Mel8V09!R46", F]
-        this[13]["Mel8V09!L47", F]["Mel8V09!N47", F]["Mel8V09!O47", F]["Mel8V09!P47", F]["Mel8V09!Q47", F]["Mel8V09!R47", F]
-        // 14 empty
-        this[15][2, "Mel8V09!C42", F][4, "Wynik", V]
-        this[16]["Mel8V09!A43", F]["Uwagi", V]["Mel8V09!C43", F]["Opis próby"]["Mel8V09!F43", F]["Mel8V09!G43", F]
+//        this[7]["Mel8V09!M20", F]["Mel8V09!N20", F]["Mel8V09!O20", F]
+//        this[8]["Mel8V09!M21", F]["Mel8V09!N21", F]
+//        // 9 empty
+//        this[10]["Mel8V09!L44", F]["Mel8V09!N44", F]["Mel8V09!Q44", F]["Mel8V09!R44", F]
+//        this[11]["Mel8V09!L45", F]["Mel8V09!N45", F]["Mel8V09!O45", F]["Mel8V09!P45", F]["Mel8V09!Q45", F]["Mel8V09!R45", F]
+//        this[12]["Mel8V09!L46", F]["Mel8V09!N46", F]["Mel8V09!O46", F]["Mel8V09!P46", F]["Mel8V09!Q46", F]["Mel8V09!R46", F]
+//        this[13]["Mel8V09!L47", F]["Mel8V09!N47", F]["Mel8V09!O47", F]["Mel8V09!P47", F]["Mel8V09!Q47", F]["Mel8V09!R47", F]
+//        // 14 empty
+//        this[15][2, "Mel8V09!C42", F][4, "Wynik", V]
+//        this[16]["Mel8V09!A43", F]["Uwagi", V]["Mel8V09!C43", F]["Opis próby"]["Mel8V09!F43", F]["Mel8V09!G43", F]
         (17..405).forEach { rowNum ->
             this[rowNum].also { row ->
                 row[0, if (rowNum <= 404) "Mel8V09!A${rowNum + 26}" else "", V][2, if (rowNum <= 404) "Mel8V09!C${rowNum + 26}" else "", V][6, "MOD(ROW(),2)", F]
@@ -951,4 +902,73 @@ class XslxService {
         sumRow.createCell(8).cellFormula = "SUM(J23:J36)"
     }
 
+}
+
+private fun SheetBuilder.renderStandardCurve() {
+    // Row 23 - Wzorzec headers and binding calculations
+    this[22][10, "Parametry regresji", V][13, "Y=a+bX", V]
+    // Row 24 - N, SD headers
+    this[23][10, "N", V][12, "SD", V]
+    // Row 25 - N count and b calculation
+    this[24][10, "COUNT(M25:M40)", F][11, "(COUNT(M25:M38)*SUMPRODUCT(M25:M38,N25:N38)-SUM(M25:M38)*SUM(N25:N38))/(COUNT(M25:M38)*SUMSQ(M25:M38)-(SUM(M25:M38))^2)", F][12, "(((COUNT(M25:M40)*SUMSQ(N25:N40)-SUM(N25:N40)^2)/(COUNT(M25:M40)*SUMSQ(M25:M40)-SUM(M25:M40)^2))*(1-N21^2)/(COUNT(M25:M40)-2))^0.5", F]
+    // Row 26 - a calculation
+    this[25][9, "a=", V][10, "SUM(N25:N38)/COUNT(M25:M38)-N19*SUM(M25:M38)/COUNT(M25:M38)", F][11, "(O19^2*SUMSQ(M25:M40)/COUNT(M25:M40))^0.5", F][13, "b=", V][14, "N19", F]
+    // Row 27 - r calculation
+    this[26][9, "r=", V][10, "CORREL(M25:M40,N25:N40)", F][14, "N21", F]
+    // Row 28 - Logit transformation headers
+    this[27][6, "bindingPercent", V][7, "logDose", V][8, "logarithmRealZero", V][11, "logDose", V][12, "logarithmRealZero", V][14, "Logit(B-Bg)", V]
+    // Row 29 - Standard curve point 1 calculations
+    this[28][5, "STD", V][6, "(G23-\$I\$16)*100/\$J\$18", F][7, "LOG(F23)", F][8, "LOG(H23/(100-H23))", F][10, "I23", F][11, "J23", F][12, "10^((LOG((G23-\$I\$16)*100/\$J\$18/(100-(G23-\$I\$16)*100/\$J\$18))-\$R\$19)/\$R\$20)", F][13, "1", V][14, "100*STDEV(O25:O26)/AVERAGE(O25:O26)", F][15, "(O25-F23)*100/F23", F][16, "O25/F23", F]
+
+    this[21][5, "STD", V][7, "%Bo-Bg", V][8, "Log(dose)", V][9, "Logit(B-Bg)", V]
+}
+
+private fun SheetBuilder.renderPoints(cpmData: List<Int>) {
+    (44..404).forEach { i ->
+        val rowIndex = i + 1 // For 1-based indexing in formulas
+        this[i].also { row ->
+            // Column A - Tube numbers (continuing from previous)
+            if (i == 44) row["25"] else row[0, "A${i}+1", F]
+            // Column B - CPM values
+            if (i - 44 < cpmData.size) row[1, cpmData[i - 44], V]
+            // Column C - Cortisol concentration formula
+            row[2, "10^((LOG((B$rowIndex-\$I\$16)*100/\$J\$18/(100-(B$rowIndex-\$I\$16)*100/\$J\$18))-\$R\$19)/\$R\$20)", F]
+            // Column D - Dilution factor
+            row[3, if (i == 44) 1.0 else "D${i}", if (i == 44) V else F]
+            // Column E - Result (concentration * dilution)
+            row[4, "C$rowIndex*D$rowIndex", F]
+            when (i) {
+                // Column F, G, H - Average (for duplicate samples), Coefficient of variation,  Sample identifiers
+                in (44..404 step 2) -> row[5, "AVERAGE(E${i}:E${i + 1})", F][6, "100*STDEV(E${i}:E${i + 1})/F$rowIndex", F][7, i - 43, V]
+                // Column H - Sample identifiers
+                in (45..403 step 2) -> row[7, i - 43, V]
+            }
+        }
+    }
+}
+
+private fun SheetBuilder.renderStandardPoints(standardPoints: List<List<String>>) {
+    standardPoints.forEachIndexed { index, point ->
+        val (fValue, _, pointNum) = point
+        val rowNum = 22 + index
+        val excelRowNum = rowNum + 1
+        val dataIndex = 15 + 1
+        val `Bo-Bg` = "J\$18"
+        val `%Bo-Bg` = "(G$excelRowNum-\$I\$$dataIndex)*100/\$${`Bo-Bg`}" // col H
+        val `Log(dose)` = "LOG(F$excelRowNum)" // col I
+        val `Logit(B-Bg)` = "LOG(H$excelRowNum/(100-H$excelRowNum))" // col J
+        // Column F - Standard concentration
+        val row = this[rowNum][5, fValue.toDouble(), V][6, "C$dataIndex", F]
+
+        // Column H - %Bo-Bg, I - Log(dose), J - Logit(B-Bg), K - X (logDose), L - Y (logit), M - Odczyt [pg] calculation, N - Punkt nr
+        row[4, "A${dataIndex}", F][6, `%Bo-Bg`, F][7, `Log(dose)`, F][8, `Logit(B-Bg)`, F][10, "I$excelRowNum", F][11, "J$excelRowNum", F][12, "10^((LOG((G$excelRowNum-\$I\$16)*100/\$J\$18/(100-(G$excelRowNum-\$I\$16)*100/\$J\$18))-\$R\$19)/\$R\$20)", F][13, pointNum, V]
+
+        // Column O - c.v. % (only for first of each duplicate)
+        if (pointNum.endsWith("1") || standardPoints.getOrNull(index + 1)?.get(2) != pointNum) {
+            row[14, "100*STDEV(O$excelRowNum:O${excelRowNum + 1})/AVERAGE(O$excelRowNum:O${excelRowNum + 1})", F]
+        }
+
+        // Column P, Q - Delta%, ng*N
+        row[15, "(O$excelRowNum-F$excelRowNum)*100/F$excelRowNum", F][16, "O$excelRowNum/F$excelRowNum", F]
+    }
 }

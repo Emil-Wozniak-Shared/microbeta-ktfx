@@ -41,9 +41,21 @@ class SheetBuilder(private val sheet: org.apache.poi.ss.usermodel.Sheet) {
     fun f(formula: String?) = Input(null, formula)
 
     operator fun get(index: Int? = null): RowBuilder {
-        val row: Row =
-            if (index != null) sheet.createRow(index)
-            else sheet.createRow(sheet.lastRowNum + 1)
+        var row: Row
+        if (index != null) {
+            try {
+                row = sheet.getRow(index)
+            } catch (_: Exception) {
+                row = sheet.createRow(index)
+            }
+        } else {
+            val newRowNum = sheet.lastRowNum + 1
+            try {
+                row = sheet.createRow(newRowNum)
+            } catch (_: Exception) {
+                row = sheet.createRow(newRowNum)
+            }
+        }
         return RowBuilder(row)
     }
 
