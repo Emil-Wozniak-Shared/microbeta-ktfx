@@ -1,10 +1,14 @@
 package pl.ejdev.medic.utils
 
 import org.apache.poi.ss.usermodel.Cell
+import org.apache.poi.ss.usermodel.CellStyle
+import org.apache.poi.ss.usermodel.DataFormat
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import java.io.File
+
+private const val INT_FORMAT = "#,##0"
 
 // DSL entry point
 fun excel(fileName: String, block: ExcelBuilder.() -> Unit) {
@@ -65,33 +69,48 @@ class SheetBuilder(private val sheet: Sheet) {
 
 // Builder for a row
 class RowBuilder(private val row: Row) {
-    fun cell(index: Int? = null, value: Any?, formula: String?) {
+    fun cell(index: Int? = null, value: Any?, formula: String?, format: String? = null): Cell {
         val cell: Cell =
             if (index != null) row.createCell(index)
             else row.createCell(row.lastCellNum.toInt().coerceAtLeast(0))
+
         if (value != null) {
             when (value) {
                 is String -> cell.setCellValue(value)
                 is Double -> cell.setCellValue(value)
                 is Int -> cell.apply {
-                    val intCellStyle = sheet.workbook.createCellStyle()
-                    intCellStyle.dataFormat = sheet.workbook.createDataFormat().getFormat("0")
-                    cellStyle = intCellStyle
-                    setCellValue(value.toDouble())
+                    val style: CellStyle = sheet.workbook.createCellStyle()
+                    val dataFormat: DataFormat = sheet.workbook.createDataFormat()
+                    style.dataFormat = dataFormat.getFormat(INT_FORMAT)
+                    cell.setCellValue(value.toDouble())
                 }
                 is Boolean -> cell.setCellValue(value)
                 else -> cell.setCellValue(value.toString())
             }
         }
         if (formula != null) {
+            if (format != null) {
+                val style: CellStyle = cell.sheet.workbook.createCellStyle()
+                val dataFormat: DataFormat = cell.sheet.workbook.createDataFormat()
+                style.dataFormat = dataFormat.getFormat(format)
+                cell.cellStyle = style
+            }
             cell.cellFormula = formula
         }
+        return cell
     }
 
     operator fun get(index: Int, input: Any, type: Type) = apply {
         when (type) {
             Type.VAL -> cell(index, input, null)
             Type.FORM -> cell(index, null, input as String)
+        }
+    }
+
+    operator fun get(index: Int, input: Any, type: Type, format: String) = apply {
+        when (type) {
+            Type.VAL -> cell(index, input, null, format)
+            Type.FORM -> cell(index, null, input as String, format)
         }
     }
 

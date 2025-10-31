@@ -1,0 +1,703 @@
+package pl.ejdev.medic.service
+
+import org.apache.poi.ss.usermodel.Cell
+import org.apache.poi.ss.usermodel.Row
+import org.apache.poi.ss.usermodel.Sheet
+
+class OldXlsxServiceImpl {
+}
+
+infix fun Sheet.row(index: Int): Row = this.createRow(index)
+infix fun Row.cell(index: Int): Cell = this.createCell(index)
+infix fun Cell.formula(text: String) {
+    this.cellFormula = text
+}
+
+infix fun Cell.value(input: Any) {
+    when (input) {
+        is Double -> this.setCellValue(input)
+        else -> this.setCellValue(input.toString())
+    }
+}
+
+
+private fun Sheet.buildWydruk() {
+    // Row 1
+    var row = this row 0
+    row cell 0 formula "Mel8V09!A1"
+    row cell 1 formula "Mel8V09!B1"
+
+    // Row 2
+    row = this row 1
+    row cell 0 formula "Mel8V09!A2"
+    row cell 1 formula "#REF!"
+
+    // Rows 3-4 empty
+
+    // Row 5
+    row = this row 4
+    row cell 0 formula "Mel8V09!M17"
+    row cell 1 formula "Mel8V09!O17"
+
+    // Row 6
+    row = this row 5
+    row cell 0 formula "Mel8V09!M18"
+    row cell 1 formula "Mel8V09!N18"
+    row cell 2 value "±SD"
+
+    // Row 7
+    row = this row 6
+    row cell 0 formula "Mel8V09!M19"
+    row cell 1 formula "Mel8V09!N19"
+    row cell 2 formula "Mel8V09!O19"
+
+    // Row 8
+    row = this row 7
+    row cell 0 formula "Mel8V09!M20"
+    row cell 1 formula "Mel8V09!N20"
+    row cell 2 formula "Mel8V09!O20"
+
+    // Row 9
+    row = this row 8
+    row cell 0 formula "Mel8V09!M21"
+    row cell 1 formula "Mel8V09!N21"
+
+    // Row 10 empty
+
+    // Rows 11-13
+    row = this row 10
+    row cell 0 formula "Mel8V09!L44"
+    row cell 1 formula "Mel8V09!N44"
+    row cell 5 formula "Mel8V09!Q44"
+    row cell 6 formula "Mel8V09!R44"
+
+    row = this row 11
+    row cell 0 formula "Mel8V09!L45"
+    row cell 1 formula "Mel8V09!N45"
+    row cell 2 formula "Mel8V09!O45"
+    row cell 4 formula "Mel8V09!P45"
+    row cell 5 formula "Mel8V09!Q45"
+    row cell 6 formula "Mel8V09!R45"
+
+    row = this row 12
+    row cell 0 formula "Mel8V09!L46"
+    row cell 1 formula "Mel8V09!N46"
+    row cell 2 formula "Mel8V09!O46"
+    row cell 4 formula "Mel8V09!P46"
+    row cell 5 formula "Mel8V09!Q46"
+    row cell 6 formula "Mel8V09!R46"
+
+    row = this row 13
+    row cell 0 formula "Mel8V09!L47"
+    row cell 1 formula "Mel8V09!N47"
+    row cell 2 formula "Mel8V09!O47"
+    row cell 4 formula "Mel8V09!P47"
+    row cell 6 formula "Mel8V09!R47"
+
+    // Row 14 empty
+
+    // Rows 15-16
+    row = this row 15
+    row cell 2 formula "Mel8V09!C42"
+    row cell 4 value "Wynik"
+
+    row = this row 16
+    row cell 0 formula "Mel8V09!A43"
+    row cell 1 value "Uwagi"
+    row cell 2 formula "Mel8V09!C43"
+    row cell 3 value "Opis próby"
+    row cell 4 formula "Mel8V09!F43"
+    row cell 5 formula "Mel8V09!G43"
+
+    // Create the main data table with formulas
+    (17..405).forEach { rowNum ->
+        row = this row rowNum
+
+        // Column A
+        if (rowNum <= 404) {
+            row cell 0 formula "Mel8V09!A${rowNum + 26}"
+        }
+
+        // Column B - mostly empty except for some labels
+
+        // Column C
+        if (rowNum <= 404) {
+            row cell 2 formula "Mel8V09!C${rowNum + 26}"
+        }
+
+        // Column D - mostly empty
+
+        // Column E - formulas and values
+        when (rowNum) {
+            17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39, 41, 43, 45, 47, 49, 51, 53, 55, 57, 59,
+            61, 63, 65, 67, 69, 71, 73, 75, 77, 79, 81, 83, 85, 87, 89, 91, 93, 95, 97, 99, 101, 103,
+            105, 107, 109, 111, 113, 115, 117, 119, 121, 123, 125, 127, 129, 131, 133, 135, 137, 139,
+            141, 143, 145, 147, 149, 151, 153, 155, 157, 159, 161, 163, 165, 167, 169, 171, 173, 175,
+            177, 179, 181, 183, 185, 187, 189, 191, 193, 195, 197, 199, 201, 203, 205, 207, 209, 211,
+            213, 215, 217, 219, 221, 223, 225, 227, 229, 231, 233, 235, 237, 239, 241, 243, 245, 247,
+            249, 251, 253, 255, 257, 259, 261, 263, 265, 267, 269, 271, 273, 275, 277, 279, 281, 283,
+            285, 287, 289, 291, 293, 295, 297, 299, 301, 303, 305, 307, 309, 311, 313, 315, 317, 319,
+            321, 323, 325, 327, 329, 331, 333, 335, 337, 339, 341, 343, 345, 347, 349, 351, 353, 355,
+            357, 359, 361, 363, 365, 367, 369, 371, 373, 375, 377, 379, 381, 383, 385, 387, 389, 391,
+            393, 395, 397, 399, 401, 403, 405 -> {
+                if (rowNum <= 404) {
+                    row cell 4 formula "Mel8V09!F${rowNum + 26}"
+                }
+            }
+        }
+
+        // Column F - formulas
+        when (rowNum) {
+            17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39, 41, 43, 45, 47, 49, 51, 53, 55, 57, 59,
+            61, 63, 65, 67, 69, 71, 73, 75, 77, 79, 81, 83, 85, 87, 89, 91, 93, 95, 97, 99, 101, 103,
+            105, 107, 109, 111, 113, 115, 117, 119, 121, 123, 125, 127, 129, 131, 133, 135, 137, 139,
+            141, 143, 145, 147, 149, 151, 153, 155, 157, 159, 161, 163, 165, 167, 169, 171, 173, 175,
+            177, 179, 181, 183, 185, 187, 189, 191, 193, 195, 197, 199, 201, 203, 205, 207, 209, 211,
+            213, 215, 217, 219, 221, 223, 225, 227, 229, 231, 233, 235, 237, 239, 241, 243, 245, 247,
+            249, 251, 253, 255, 257, 259, 261, 263, 265, 267, 269, 271, 273, 275, 277, 279, 281, 283,
+            285, 287, 289, 291, 293, 295, 297, 299, 301, 303, 305, 307, 309, 311, 313, 315, 317, 319,
+            321, 323, 325, 327, 329, 331, 333, 335, 337, 339, 341, 343, 345, 347, 349, 351, 353, 355,
+            357, 359, 361, 363, 365, 367, 369, 371, 373, 375, 377, 379, 381, 383, 385, 387, 389, 391,
+            393, 395, 397, 399, 401, 403, 405 -> {
+                if (rowNum <= 404) {
+                    row cell 5 formula "Mel8V09!G${rowNum + 26}"
+                }
+            }
+        }
+
+        // Column G - MOD formulas
+        row cell 6 formula "MOD(ROW(),2)"
+
+        // Column H - references to column E
+        when (rowNum) {
+            18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60,
+            62, 64, 66, 68, 70, 72, 74, 76, 78, 80, 82, 84, 86, 88, 90, 92, 94, 96, 98, 100, 102, 104,
+            106, 108, 110, 112, 114, 116, 118, 120, 122, 124, 126, 128, 130, 132, 134, 136, 138, 140,
+            142, 144, 146, 148, 150, 152, 154, 156, 158, 160, 162, 164, 166, 168, 170, 172, 174, 176,
+            178, 180, 182, 184, 186, 188, 190, 192, 194, 196, 198, 200, 202, 204, 206, 208, 210, 212,
+            214, 216, 218, 220, 222, 224, 226, 228, 230, 232, 234, 236, 238, 240, 242, 244, 246, 248,
+            250, 252, 254, 256, 258, 260, 262, 264, 266, 268, 270, 272, 274, 276, 278, 280, 282, 284,
+            286, 288, 290, 292, 294, 296, 298, 300, 302, 304, 306, 308, 310, 312, 314, 316, 318, 320,
+            322, 324, 326, 328, 330, 332, 334, 336, 338, 340, 342, 344, 346, 348, 350, 352, 354, 356,
+            358, 360, 362, 364, 366, 368, 370, 372, 374, 376, 378, 380, 382, 384, 386, 388, 390, 392,
+            394, 396, 398, 400, 402, 404 -> {
+                row cell 7 formula "E${rowNum + 1}"
+            }
+        }
+
+        // Column I - sequential numbers and formulas
+        when (rowNum) {
+            17 -> row cell 8 value 1.0
+            18 -> row cell 8 value 2.0
+            19 -> row cell 8 formula "I18+1"
+            20 -> row cell 8 value 4.0
+            21 -> row cell 8 formula "I20+1"
+            // Continue this pattern for all rows...
+            else -> {
+                when {
+                    rowNum in 22..404 && rowNum % 2 == 1 -> row cell 8 formula "I${rowNum - 1}+1"
+                    rowNum in 22..404 -> row cell 8 value (rowNum - 16).toDouble()
+                }
+            }
+        }
+
+        // Column J - labels
+        when (rowNum) {
+            17 -> row cell 9 value "53F"
+            92 -> row cell 9 value "54K"
+            142 -> row cell 9 value "56K"
+            192 -> row cell 9 value "52F"
+            242 -> row cell 9 value "58K"
+            292 -> row cell 9 value "54F"
+            344 -> row cell 9 value "52K"
+        }
+
+        // Column K - values (mostly 1s in specific rows)
+        when (rowNum) {
+            292, 294, 296, 298, 300, 302, 304, 306, 308, 310, 312, 314, 316, 318, 320, 322, 324, 326,
+            328, 330, 332, 334, 336, 338, 340 -> row cell 10 value 1.0
+        }
+    }
+}
+
+private fun buildMel8V09Sheet(sheet: Sheet) {
+    // Header section (rows 0-5)
+    var row = sheet.createRow(0)
+    row.createCell(0).setCellValue("RIA")
+    row.createCell(1).setCellValue("Data")
+
+    row = sheet.createRow(1)
+    row.createCell(0).setCellValue("Kortyzol")
+    row.createCell(1).setCellValue("2019-01-08 00:00:00")
+    row.createCell(2).setCellValue("Owce")
+
+    row = sheet.createRow(2)
+    row.createCell(4).setCellValue("% Bo")
+    row.createCell(5).cellFormula = "G5*100/\$J\$18"
+    row.createCell(6).cellFormula = "(H5-I16)*100/\$J\$18"
+    row.createCell(7).cellFormula = "(I5-I16)*100/\$J\$18"
+    row.createCell(8).cellFormula = "(J5-I16)*100/\$J\$18"
+    row.createCell(9).cellFormula = "(K5-I16)*100/\$J\$18"
+    row.createCell(10).cellFormula = "(L5-I16)*100/\$J\$18"
+    row.createCell(11).cellFormula = "(M5-I16)*100/\$J\$18"
+    row.createCell(12).cellFormula = "(N5-I16)*100/\$J\$18"
+    row.createCell(13).cellFormula = "(O5-I16)*100/\$J\$18"
+    row.createCell(15).cellFormula = "J18*100/I14"
+
+    row = sheet.createRow(3)
+    row.createCell(4).setCellValue("% T")
+    row.createCell(5).cellFormula = "F5*100/\$F\$5"
+    row.createCell(6).cellFormula = "G5*100/\$F\$5"
+    row.createCell(7).cellFormula = "(H5-\$I\$16)*100/\$F\$5"
+    row.createCell(8).cellFormula = "(I5-\$I\$16)*100/\$F\$5"
+    row.createCell(9).cellFormula = "(J5-\$I\$16)*100/\$F\$5"
+    row.createCell(10).cellFormula = "(K5-\$I\$16)*100/\$F\$5"
+    row.createCell(11).cellFormula = "(L5-\$I\$16)*100/\$F\$5"
+    row.createCell(12).cellFormula = "(M5-\$I\$16)*100/\$F\$5"
+    row.createCell(13).cellFormula = "(N5-\$I\$16)*100/\$F\$5"
+    row.createCell(14).cellFormula = "(O5-\$I\$16)*100/\$F\$5"
+    row.createCell(15).cellFormula = "(P5-\$I\$16)*100/\$F\$5"
+
+    row = sheet.createRow(4)
+    row.createCell(2).setCellValue("Wpisz")
+    row.createCell(4).setCellValue("Mean [cpm]")
+    row.createCell(5).cellFormula = "AVERAGE(G14:G15)"
+    row.createCell(6).cellFormula = "AVERAGE(G16:G17)"
+    row.createCell(7).cellFormula = "AVERAGE(G18:G20)"
+    row.createCell(8).cellFormula = "AVERAGE(G23:G24)"
+    row.createCell(9).cellFormula = "AVERAGE(G25:G26)"
+    row.createCell(10).cellFormula = "AVERAGE(G27:G28)"
+    row.createCell(11).cellFormula = "AVERAGE(G29:G30)"
+    row.createCell(12).cellFormula = "AVERAGE(G31:G32)"
+    row.createCell(13).cellFormula = "AVERAGE(G33:G34)"
+    row.createCell(14).cellFormula = "AVERAGE(G35:G36)"
+    row.createCell(15).cellFormula = "AVERAGE(G37:G39)"
+
+    row = sheet.createRow(5)
+    row.createCell(0).setCellValue("Nr probówki")
+    row.createCell(1).setCellValue("Zawartość")
+    row.createCell(2).setCellValue("cpm")
+    row.createCell(4).setCellValue("N")
+    row.createCell(5).cellFormula = "COUNT(G14:G15)"
+    row.createCell(6).cellFormula = "COUNT(G16:G17)"
+    row.createCell(7).cellFormula = "COUNT(G18:G21)"
+    row.createCell(8).cellFormula = "COUNT(G23:G24)"
+    row.createCell(9).cellFormula = "COUNT(G25:G26)"
+    row.createCell(10).cellFormula = "COUNT(G27:G28)"
+    row.createCell(11).cellFormula = "COUNT(G29:G30)"
+    row.createCell(12).cellFormula = "COUNT(G31:G32)"
+    row.createCell(13).cellFormula = "COUNT(G33:G34)"
+    row.createCell(14).cellFormula = "COUNT(G35:G36)"
+    row.createCell(15).cellFormula = "COUNT(G37:G39)"
+
+    // Sample data rows 6-21
+    val initialData = listOf(
+        listOf("1", "Total", "1976"),
+        listOf("2", "Total", "1982"),
+        listOf("3", "Bg", "32"),
+        listOf("4", "Bg", "36"),
+        listOf("5", "Bo", "458"),
+        listOf("6", "Bo", "459"),
+        listOf("7", "Bo", "447"),
+        listOf("8", "1.25", "412"),
+        listOf("9", "1.25", "390"),
+        listOf("10", "2.5", "378"),
+        listOf("11", "2.5", "352"),
+        listOf("12", "5", "322"),
+        listOf("13", "5", "316"),
+        listOf("14", "10", "225"),
+        listOf("15", "10", "249"),
+        listOf("16", "20", "165"),
+        listOf("17", "20", "174"),
+        listOf("18", "40", "102"),
+        listOf("19", "40", "116"),
+        listOf("20", "80", "74"),
+        listOf("21", "80", "65")
+    )
+
+    initialData.forEachIndexed { index, data ->
+        row = sheet.createRow(6 + index)
+        row.createCell(0).setCellValue(data[0])
+        row.createCell(1).setCellValue(data[1])
+        row.createCell(2).setCellValue(data[2].toDouble())
+    }
+
+    // Standard curve and calculations (rows 22-42)
+    // This section contains complex formulas for the RIA standard curve
+
+    // MAIN DATA SECTION - Rows 43 onwards with CPM values in column B
+    row = sheet.createRow(43)
+    row.createCell(0).setCellValue("Nr probówki")
+    row.createCell(1).setCellValue("cpm")
+    row.createCell(2).setCellValue("ng/ml")
+    row.createCell(3).setCellValue("rozc.")
+    row.createCell(4).setCellValue("Wynik")
+    row.createCell(5).setCellValue("Srednia")
+    row.createCell(6).setCellValue("c.v.")
+
+    // CPM data for rows 44-404 in column B
+    val cpmData = listOf(
+        219, 224, 164, 191, 226, 230, 293, 279, 325, 347, 386, 388, 372, 379, 293, 330, 252, 237,
+        225, 247, 211, 220, 313, 295, 338, 341, 335, 362, 368, 392, 402, 402, 237, 220, 264, 295,
+        359, 352, 400, 403, 411, 437, 477, 469, 454, 474, 483, 450, 412, 440, 262, 201, 250, 242,
+        227, 270, 298, 299, 341, 300, 392, 410, 442, 413, 453, 449, 440, 477, 465, 469, 417, 373,
+        297, 286, 341, 342, 375, 437, 392, 399, 391, 421, 452, 421, 468, 494, 473, 470, 395, 404,
+        358, 355, 352, 373, 431, 387, 441, 456, 417, 460, 186, 176, 157, 158, 161, 138, 141, 150,
+        194, 177, 17, 20, 235, 243, 309, 290, 335, 341, 396, 371, 400, 407, 412, 423, 375, 403,
+        372, 365, 412, 358, 389, 432, 442, 446, 472, 435, 473, 456, 441, 440, 438, 472, 419, 444,
+        382, 415, 433, 414, 455, 426, 482, 488, 248, 245, 235, 246, 187, 169, 199, 182, 228, 242,
+        266, 293, 341, 358, 330, 296, 245, 259, 236, 262, 287, 284, 252, 265, 237, 252, 291, 296,
+        233, 243, 229, 249, 259, 234, 240, 244, 279, 294, 312, 310, 326, 354, 321, 358, 229, 225,
+        215, 220, 262, 271, 221, 236, 220, 226, 240, 258, 308, 297, 307, 299, 259, 255, 222, 212,
+        192, 196, 199, 166, 196, 182, 305, 307, 341, 340, 361, 370, 246, 246, 204, 211, 194, 167,
+        166, 181, 196, 174, 191
+    )
+
+    // Create rows 44-404 with CPM data and formulas
+    (44..404).forEach { i ->
+        row = sheet.createRow(i)
+        val rowIndex = i + 1 // For 1-based indexing in formulas
+
+        // Column A - Tube numbers (continuing from previous)
+        if (i == 44) {
+            row.createCell(0).setCellValue("25")
+        } else {
+            row.createCell(0).cellFormula = "A${i}+1"
+        }
+
+        // Column B - CPM values (the critical data that was missing)
+        val cpmIndex = i - 44
+        if (cpmIndex < cpmData.size) {
+            row.createCell(1).setCellValue(cpmData[cpmIndex].toDouble())
+        }
+
+        // Column C - Cortisol concentration formula
+        val concentrationFormula =
+            "10^((LOG((B$rowIndex-\$I\$16)*100/\$J\$18/(100-(B$rowIndex-\$I\$16)*100/\$J\$18))-\$R\$19)/\$R\$20)"
+        row.createCell(2).cellFormula = concentrationFormula
+
+        // Column D - Dilution factor
+        if (i == 44) {
+            row.createCell(3).setCellValue(1.0)
+        } else {
+            row.createCell(3).cellFormula = "D${i}"
+        }
+
+        // Column E - Result (concentration * dilution)
+        row.createCell(4).cellFormula = "C$rowIndex*D$rowIndex"
+
+        when (i) {
+            in (44..404 step 2) -> {
+                // Column F - Average (for duplicate samples)
+                row.createCell(5).cellFormula = "AVERAGE(E${i}:E${i + 1})"
+                // Column G - Coefficient of variation
+                row.createCell(6).cellFormula = "100*STDEV(E${i}:E${i + 1})/F$rowIndex"
+            }
+        }
+
+        // Column H - Sample identifiers
+        when (i) {
+            44 -> row.createCell(7).setCellValue("1")
+            46 -> row.createCell(7).setCellValue("2")
+            48 -> row.createCell(7).setCellValue("3")
+            50 -> row.createCell(7).setCellValue("4")
+            52 -> row.createCell(7).setCellValue("5")
+            54 -> row.createCell(7).setCellValue("6")
+            56 -> row.createCell(7).setCellValue("7")
+            58 -> row.createCell(7).setCellValue("8")
+            60 -> row.createCell(7).setCellValue("9")
+            62 -> row.createCell(7).setCellValue("10")
+            // ... continue pattern
+            92 -> row.createCell(8).setCellValue("54K")
+            142 -> row.createCell(8).setCellValue("56K")
+            192 -> row.createCell(8).setCellValue("52F")
+            242 -> row.createCell(8).setCellValue("58K")
+            292 -> row.createCell(8).setCellValue("54F")
+            344 -> row.createCell(8).setCellValue("52K")
+        }
+    }
+
+    // ... (previous header and initial data setup remains the same)
+
+    // CRITICAL SECTION: Standard Curve Data and Calculations (Rows 13-23, Columns E-J)
+
+    // Row 13 - Standard curve headers and initial calculations
+    val row13 = sheet.createRow(12)
+    row13.createCell(4).setCellValue("c.v. [%]")
+    row13.createCell(5).cellFormula = "STDEV(G14:G15)*100/F5"
+    row13.createCell(6).cellFormula = "STDEV(G16:G17)*100/G5"
+    row13.createCell(7).cellFormula = "STDEV(G18:G21)*100/H5"
+    row13.createCell(8).cellFormula = "STDEV(G23:G24)*100/I5"
+    row13.createCell(9).cellFormula = "STDEV(G25:G26)*100/J5"
+    row13.createCell(10).cellFormula = "STDEV(G27:G28)*100/K5"
+    row13.createCell(11).cellFormula = "STDEV(G29:G30)*100/L5"
+    row13.createCell(12).cellFormula = "STDEV(G31:G32)*100/M5"
+    row13.createCell(13).cellFormula = "STDEV(G33:G34)*100/N5"
+    row13.createCell(14).cellFormula = "STDEV(G35:G36)*100/O5"
+    row13.createCell(15).cellFormula = "STDEV(G37:G39)*100/P5"
+
+    // Row 14 - Diff%Mean calculations
+    val row14 = sheet.createRow(13)
+    row14.createCell(4).setCellValue("Diff%Mean")
+    row14.createCell(5).cellFormula = "G14*100/\$F\$5-100"
+    row14.createCell(6).cellFormula = "G16*100/\$G\$5-100"
+    row14.createCell(7).cellFormula = "G18*100/\$H\$5-100"
+    row14.createCell(8).cellFormula = "G23*100/\$I\$5-100"
+    row14.createCell(9).cellFormula = "G25*100/\$J\$5-100"
+    row14.createCell(10).cellFormula = "G27*100/\$K\$5-100"
+    row14.createCell(11).cellFormula = "G29*100/\$L\$5-100"
+    row14.createCell(12).cellFormula = "G31*100/\$M\$5-100"
+    row14.createCell(13).cellFormula = "G33*100/\$N\$5-100"
+    row14.createCell(14).cellFormula = "G35*100/\$N\$5-100"
+    row14.createCell(15).cellFormula = "G37*100/\$N\$5-100"
+
+    // Row 15 - Second set of Diff%Mean calculations
+    val row15 = sheet.createRow(14)
+    row15.createCell(5).cellFormula = "G15*100/\$F\$5-100"
+    row15.createCell(6).cellFormula = "G17*100/\$G\$5-100"
+    row15.createCell(7).cellFormula = "G19*100/\$H\$5-100"
+    row15.createCell(8).cellFormula = "G24*100/\$I\$5-100"
+    row15.createCell(9).cellFormula = "G26*100/\$J\$5-100"
+    row15.createCell(10).cellFormula = "G28*100/\$K\$5-100"
+    row15.createCell(11).cellFormula = "G30*100/\$L\$5-100"
+    row15.createCell(12).cellFormula = "G32*100/\$M\$5-100"
+    row15.createCell(13).cellFormula = "G34*100/\$N\$5-100"
+    row15.createCell(14).cellFormula = "G36*100/\$N\$5-100"
+    row15.createCell(15).cellFormula = "G38*100/\$N\$5-100"
+
+    // Row 16 - Empty row for spacing
+
+    // Row 17 - Tube No., Content, [cpm], Mean; c.v., Akceptuj headers
+    val row17 = sheet.createRow(16)
+    row17.createCell(4).setCellValue("Tube No.")
+    row17.createCell(5).setCellValue("Content")
+    row17.createCell(6).setCellValue("[cpm]")
+    row17.createCell(7).setCellValue("Mean; c.v.")
+    row17.createCell(8).setCellValue("Akceptuj")
+
+    // Row 18 - First tube data and calculations
+    val row18 = sheet.createRow(17)
+    row18.createCell(4).cellFormula = "A7"
+    row18.createCell(5).cellFormula = "B7"
+    row18.createCell(6).cellFormula = "C7"
+    row18.createCell(7).cellFormula = "AVERAGE(G14:G15)"
+    row18.createCell(8).cellFormula = "H14"
+
+    // Row 19 - Second tube data and calculations
+    val row19 = sheet.createRow(18)
+    row19.createCell(4).cellFormula = "A8"
+    row19.createCell(5).cellFormula = "B8"
+    row19.createCell(6).cellFormula = "C8"
+    row19.createCell(7).cellFormula = "STDEV(G14:G15)*100/H14"
+
+    // Row 20 - Third tube data and calculations
+    val row20 = sheet.createRow(19)
+    row20.createCell(4).cellFormula = "A9"
+    row20.createCell(5).setCellValue("O")
+    row20.createCell(6).cellFormula = "C9"
+    row20.createCell(7).cellFormula = "AVERAGE(G16:G17)"
+    row20.createCell(8).cellFormula = "H16"
+    row20.createCell(9).setCellValue("Bo-Bg")
+
+    // Row 21 - Fourth tube data and calculations
+    val row21 = sheet.createRow(20)
+    row21.createCell(4).cellFormula = "A10"
+    row21.createCell(5).setCellValue("O")
+    row21.createCell(6).cellFormula = "C10"
+    row21.createCell(7).cellFormula = "STDEV(G16:G17)*100/H16"
+    row21.createCell(9).cellFormula = "I18-I16"
+
+    // Row 22 - Fifth tube data and calculations
+    val row22 = sheet.createRow(21)
+    row22.createCell(4).cellFormula = "A11"
+    row22.createCell(5).setCellValue("N")
+    row22.createCell(6).cellFormula = "C11"
+    row22.createCell(7).cellFormula = "AVERAGE(G18:G20)"
+    row22.createCell(8).cellFormula = "H18"
+    row22.createCell(9).cellFormula = "I18-I16"
+
+    // Row 23 - Sixth tube data and calculations
+    val row23 = sheet.createRow(22)
+    row23.createCell(4).cellFormula = "A12"
+    row23.createCell(5).setCellValue("N")
+    row23.createCell(6).cellFormula = "C12"
+    row23.createCell(7).cellFormula = "STDEV(G18:G20)*100/H18"
+
+    // STANDARD CURVE REGRESSION SECTION (Rows 23-40)
+
+    // Row 23 - Wzorzec headers and binding calculations
+    val row23b = sheet.getRow(22) ?: sheet.createRow(22)
+    row23b.createCell(10).setCellValue("Parametry regresji")
+    row23b.createCell(13).setCellValue("Y=a+bX")
+
+    // Row 24 - N, SD headers
+    val row24 = sheet.createRow(23)
+    row24.createCell(10).setCellValue("N")
+    row24.createCell(12).setCellValue("SD")
+
+    // Row 25 - N count and b calculation
+    val row25 = sheet.createRow(24)
+    row25.createCell(10).cellFormula = "COUNT(M25:M40)"
+    row25.createCell(11).cellFormula =
+        "(COUNT(M25:M38)*SUMPRODUCT(M25:M38,N25:N38)-SUM(M25:M38)*SUM(N25:N38))/(COUNT(M25:M38)*SUMSQ(M25:M38)-(SUM(M25:M38))^2)"
+    row25.createCell(12).cellFormula =
+        "(((COUNT(M25:M40)*SUMSQ(N25:N40)-SUM(N25:N40)^2)/(COUNT(M25:M40)*SUMSQ(M25:M40)-SUM(M25:M40)^2))*(1-N21^2)/(COUNT(M25:M40)-2))^0.5"
+
+    // Row 26 - a calculation
+    val row26 = sheet.createRow(25)
+    row26.createCell(9).setCellValue("a=")
+    row26.createCell(10).cellFormula = "SUM(N25:N38)/COUNT(M25:M38)-N19*SUM(M25:M38)/COUNT(M25:M38)"
+    row26.createCell(11).cellFormula = "(O19^2*SUMSQ(M25:M40)/COUNT(M25:M40))^0.5"
+    row26.createCell(13).setCellValue("b=")
+    row26.createCell(14).cellFormula = "N19"
+
+    // Row 27 - r calculation
+    val row27 = sheet.createRow(26)
+    row27.createCell(9).setCellValue("r=")
+    row27.createCell(10).cellFormula = "CORREL(M25:M40,N25:N40)"
+    row27.createCell(14).cellFormula = "N21"
+
+    // Row 28 - Logit transformation headers
+    val row28 = sheet.createRow(27)
+    row28.createCell(6).setCellValue("bindingPercent")
+    row28.createCell(7).setCellValue("logDose")
+    row28.createCell(8).setCellValue("logarithmRealZero")
+    row28.createCell(11).setCellValue("logDose")
+    row28.createCell(12).setCellValue("logarithmRealZero")
+    row28.createCell(14).setCellValue("Logit(B-Bg)")
+
+    // Row 29 - Standard curve point 1 calculations
+    val row29 = sheet.createRow(28)
+    row29.createCell(5).setCellValue("STD")
+    row29.createCell(6).cellFormula = "(G23-\$I\$16)*100/\$J\$18"  // %Bo-Bg
+    row29.createCell(7).cellFormula = "LOG(F23)"                   // Log(dose)
+    row29.createCell(8).cellFormula = "LOG(H23/(100-H23))"        // Logit(B-Bg)
+    row29.createCell(10).cellFormula = "I23"                      // X
+    row29.createCell(11).cellFormula = "J23"                      // Y
+    row29.createCell(12).cellFormula =
+        "10^((LOG((G23-\$I\$16)*100/\$J\$18/(100-(G23-\$I\$16)*100/\$J\$18))-\$R\$19)/\$R\$20)" // Odczyt [pg]
+    row29.createCell(13).setCellValue("1")                          // Punkt nr
+    row29.createCell(14).cellFormula = "100*STDEV(O25:O26)/AVERAGE(O25:O26)" // c.v. %
+    row29.createCell(15).cellFormula = "(O25-F23)*100/F23"        // Delta%
+    row29.createCell(16).cellFormula = "O25/F23"                  // ng*N
+
+    // Continue with standard curve points 2-16 (rows 30-44)
+    setupStandardCurvePoints(sheet)
+
+    // Add regression parameters and other calculations
+    setupRegressionParameters(sheet)
+}
+
+private fun setupRegressionParameters(sheet: Sheet) {
+    // Setup regression parameters in rows 18-22
+    val row18 = sheet.getRow(17) ?: sheet.createRow(17)
+    row18.createCell(17).cellFormula = "COUNT(M25:M40)"
+    row18.createCell(18).setCellValue("SD")
+
+    val row19 = sheet.getRow(18) ?: sheet.createRow(18)
+    row19.createCell(17).cellFormula =
+        "(COUNT(M25:M38)*SUMPRODUCT(M25:M38,N25:N38)-SUM(M25:M38)*SUM(N25:N38))/(COUNT(M25:M38)*SUMSQ(M25:M38)-(SUM(M25:M38))^2)"
+    row19.createCell(18).cellFormula =
+        "(((COUNT(M25:M40)*SUMSQ(N25:N40)-SUM(N25:N40)^2)/(COUNT(M25:M40)*SUMSQ(M25:M40)-SUM(M25:M40)^2))*(1-N21^2)/(COUNT(M25:M40)-2))^0.5"
+
+    val row20 = sheet.getRow(19) ?: sheet.createRow(19)
+    row20.createCell(16).setCellValue("a=")
+    row20.createCell(17).cellFormula = "SUM(N25:N38)/COUNT(M25:M38)-N19*SUM(M25:M38)/COUNT(M25:M38)"
+    row20.createCell(18).cellFormula = "(O19^2*SUMSQ(M25:M40)/COUNT(M25:M40))^0.5"
+
+    val row21 = sheet.getRow(20) ?: sheet.createRow(20)
+    row21.createCell(16).setCellValue("b=")
+    row21.createCell(17).cellFormula = "CORREL(M25:M40,N25:N40)"
+    row21.createCell(18).setCellValue("") // Empty cell
+
+    val row22 = sheet.getRow(21) ?: sheet.createRow(21)
+    row22.createCell(16).setCellValue("r=")
+    row22.createCell(17).cellFormula = "N21"
+}
+
+
+private fun setupStandardCurvePoints(sheet: Sheet) {
+    // Standard curve points 2-16
+    val standardPoints = listOf(
+        // row, F_col_value, G_col_cpm, point_number
+        listOf("29", "20", "174", "1"),
+        listOf("30", "40", "102", "2"),
+        listOf("31", "40", "116", "2"),
+        listOf("32", "80", "74", "3"),
+        listOf("33", "80", "65", "3"),
+        listOf("34", "1.25", "412", "4"),
+        listOf("35", "1.25", "390", "4"),
+        listOf("36", "2.5", "378", "5"),
+        listOf("37", "2.5", "352", "5"),
+        listOf("38", "5", "322", "6"),
+        listOf("39", "5", "316", "6"),
+        listOf("40", "10", "225", "7"),
+        listOf("41", "10", "249", "7")
+    )
+
+    standardPoints.forEachIndexed { index, point ->
+        val (fValue, _, pointNum) = point
+        val rowNum = 28 + index
+        val row = sheet.createRow(rowNum)
+        val excelRowNum = rowNum + 1
+
+        // Column F - Standard concentration
+        row.createCell(5).setCellValue(fValue.toDouble())
+
+        // Column G - CPM value
+        when (rowNum) {
+            29 -> row.createCell(6).cellFormula = "G24"
+            30 -> row.createCell(6).cellFormula = "G25"
+            31 -> row.createCell(6).cellFormula = "G26"
+            32 -> row.createCell(6).cellFormula = "G27"
+            33 -> row.createCell(6).cellFormula = "G28"
+            34 -> row.createCell(6).cellFormula = "G29"
+            35 -> row.createCell(6).cellFormula = "G30"
+            36 -> row.createCell(6).cellFormula = "G31"
+            37 -> row.createCell(6).cellFormula = "G32"
+            38 -> row.createCell(6).cellFormula = "G33"
+            39 -> row.createCell(6).cellFormula = "G34"
+            40 -> row.createCell(6).cellFormula = "G35"
+            41 -> row.createCell(6).cellFormula = "G36"
+        }
+
+        // Column H - %Bo-Bg
+        row.createCell(6).cellFormula = "(G$excelRowNum-\$I\$16)*100/\$J\$18"
+
+        // Column I - Log(dose)
+        row.createCell(7).cellFormula = "LOG(F$excelRowNum)"
+
+        // Column J - Logit(B-Bg)
+        row.createCell(8).cellFormula = "LOG(H$excelRowNum/(100-H$excelRowNum))"
+
+        // Column K - X (logDose)
+        row.createCell(10).cellFormula = "I$excelRowNum"
+
+        // Column L - Y (logit)
+        row.createCell(11).cellFormula = "J$excelRowNum"
+
+        // Column M - Odczyt [pg] calculation
+        row.createCell(12).cellFormula =
+            "10^((LOG((G$excelRowNum-\$I\$16)*100/\$J\$18/(100-(G$excelRowNum-\$I\$16)*100/\$J\$18))-\$R\$19)/\$R\$20)"
+
+        // Column N - Punkt nr
+        row.createCell(13).setCellValue(pointNum)
+
+        // Column O - c.v. % (only for first of each duplicate)
+        if (pointNum.endsWith("1") || standardPoints.getOrNull(index + 1)?.get(2) != pointNum) {
+            val nextRow = excelRowNum + 1
+            row.createCell(14).cellFormula = "100*STDEV(O$excelRowNum:O$nextRow)/AVERAGE(O$excelRowNum:O$nextRow)"
+        }
+
+        // Column P - Delta%
+        row.createCell(15).cellFormula = "(O$excelRowNum-F$excelRowNum)*100/F$excelRowNum"
+
+        // Column Q - ng*N
+        row.createCell(16).cellFormula = "O$excelRowNum/F$excelRowNum"
+    }
+
+    // Add the sum formulas
+    val sumRow = sheet.createRow(42)
+    sumRow.createCell(7).setCellValue("SUMA:")
+    sumRow.createCell(8).cellFormula = "SUM(J23:J36)"
+}

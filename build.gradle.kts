@@ -61,6 +61,7 @@ dependencies {
 
     implementation("org.apache.poi:poi:5.2.3")
     implementation("org.apache.poi:poi-ooxml:5.4.0")
+    implementation("org.dhatim:fastexcel:0.19.0")
     implementation("org.apache.xmlbeans:xmlbeans:5.1.1")
     implementation("org.apache.commons:commons-compress:1.26.0")
     implementation("commons-io:commons-io:2.14.0")
