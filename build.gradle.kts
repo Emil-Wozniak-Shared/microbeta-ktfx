@@ -14,9 +14,6 @@ repositories {
     mavenCentral()
 }
 
-val junitVersion = "5.12.1"
-
-
 tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
 }
@@ -25,6 +22,7 @@ application {
     mainModule.set("pl.ejdev.medic")
     mainClass.set("pl.ejdev.medic.MedicApplication")
 }
+
 kotlin {
     jvmToolchain(17)
 }
@@ -35,6 +33,9 @@ javafx {
 }
 
 dependencies {
+
+    val junitVersion = "5.12.1"
+
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
     implementation("org.controlsfx:controlsfx:11.2.1")
     implementation("com.dlsc.formsfx:formsfx-core:11.6.0") {
@@ -62,6 +63,7 @@ dependencies {
     implementation("org.apache.poi:poi:5.2.3")
     implementation("org.apache.poi:poi-ooxml:5.4.0")
     implementation("org.dhatim:fastexcel:0.19.0")
+    implementation("org.dhatim:fastexcel-reader:0.18.4")
     implementation("org.apache.xmlbeans:xmlbeans:5.1.1")
     implementation("org.apache.commons:commons-compress:1.26.0")
     implementation("commons-io:commons-io:2.14.0")
@@ -129,4 +131,25 @@ jlink {
     }
 }
 
+val generateBuildConfig by tasks.registering {
+    val outputDir = layout.buildDirectory.dir("generated/buildConfig")
+    val outputFile = outputDir.map { it.file("build.properties") }
+
+    // Tell Gradle that this task produces a directory
+    outputs.dir(outputDir)
+
+    doLast {
+        val dir = outputDir.get().asFile
+        dir.mkdirs()
+
+        outputFile.get().asFile.writeText(
+            """
+            name=${project.name}
+            version=${project.version}
+            """.trimIndent()
+        )
+    }
+}
+
+sourceSets["main"].resources.srcDir(generateBuildConfig)
 

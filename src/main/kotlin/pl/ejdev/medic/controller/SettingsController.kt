@@ -5,7 +5,9 @@ import pl.ejdev.medic.model.Settings
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
-import java.util.Properties
+import java.util.*
+
+private const val CALIBRATION_VALUE_SEPARATOR = ";"
 
 class SettingsController {
     private val configDir: File = File(System.getProperty("user.home"), ".medic")
@@ -38,7 +40,7 @@ class SettingsController {
      * Returns defaults if file is missing or corrupted.
      */
     fun load(): Settings {
-            if (!file.exists()) {
+        if (!file.exists()) {
             return Settings()
         }
 
@@ -49,7 +51,14 @@ class SettingsController {
             curve = Settings.Curve(
                 totalCount = props.getProperty("curve.totalCount")?.toIntOrNull() ?: 2,
                 nsbCount = props.getProperty("curve.nsbCount")?.toIntOrNull() ?: 3,
-                zeroCount = props.getProperty("curve.zeroCount")?.toIntOrNull() ?: 3
+                zeroCount = props.getProperty("curve.zeroCount")?.toIntOrNull() ?: 3,
+                calibration = Settings.Calibration(
+                    values = props.getProperty("curve.calibration.values")
+                        ?.split(CALIBRATION_VALUE_SEPARATOR)
+                        ?.toList()
+                        ?: Settings.CALIBRATION_DEFAULT_VALUES,
+                    repeats = props.getProperty("curve.calibration.repeats")?.toIntOrNull() ?: 2,
+                )
             ),
             exportType = props.getProperty("exportType")
                 ?.let { runCatching { Settings.ExportType.valueOf(it) }.getOrNull() }
@@ -65,6 +74,12 @@ class SettingsController {
             setProperty("curve.totalCount", settings.curve.totalCount.toString())
             setProperty("curve.nsbCount", settings.curve.nsbCount.toString())
             setProperty("curve.zeroCount", settings.curve.zeroCount.toString())
+            setProperty("curve.calibration.repeats", settings.curve.calibration.repeats.toString())
+            setProperty(
+                "curve.calibration.values", settings.curve.calibration.values.joinToString(
+                    CALIBRATION_VALUE_SEPARATOR
+                )
+            )
             setProperty("exportType", settings.exportType.name)
         }
 

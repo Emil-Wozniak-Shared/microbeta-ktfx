@@ -12,9 +12,16 @@ data class Sample(
         T("Total"),
         N("NSB"),
         O("Zero"),
+        C("Calibration"),
         S("Sample"),
-        X("-")
+        X("-");
+
+        fun isTotal() = this == T
+        fun isNsb() = this == N
+        fun isZero() = this == N
+        fun isControlPoint() = this == N
     }
+
 
     companion object {
         const val ID = "id"

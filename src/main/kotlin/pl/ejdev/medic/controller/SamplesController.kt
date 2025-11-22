@@ -1,20 +1,24 @@
 package pl.ejdev.medic.controller
 
+import com.almasb.fxgl.core.reflect.ReflectionUtils.inject
 import javafx.beans.property.ObjectProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
 import javafx.collections.FXCollections.observableArrayList
 import javafx.collections.ObservableList
+import org.koin.java.KoinJavaComponent.inject
 import pl.ejdev.medic.model.Plate
 import pl.ejdev.medic.model.RunInformation
 import pl.ejdev.medic.model.Sample
+import pl.ejdev.medic.service.ControlCurveHandler
 
 private const val SAMPLE_START_PATTERN = "\tUnk"
 private const val TABULATOR = "\t"
 
-class SamplesController(
-    private val settingsController: SettingsController
-) {
+class SamplesController() {
+    private val settingsController: SettingsController by inject(SettingsController::class.java)
+    private val controlCurveHandler: ControlCurveHandler by inject(ControlCurveHandler::class.java)
+
     private val _samples = observableArrayList<Sample>()
     private val _runInformation: ObjectProperty<RunInformation?> = SimpleObjectProperty(null)
     private val _plates: ObservableList<Plate> = FXCollections.observableArrayList()
@@ -33,16 +37,17 @@ class SamplesController(
         extractRunInformation(data)
         extractPlates(data)
         val parsed = data
+            .asSequence()
             .filter { it.contains(SAMPLE_START_PATTERN) }
             .map { it.split(TABULATOR).filter(String::isNotBlank) }
             .mapIndexedNotNull { id, chunks -> tryCreateSample(chunks, id) }
+            .toList()
 
         println("Parsed ${parsed.size} samples")
         _samples.setAll(parsed)
     }
 
     private fun extractRunInformation(data: List<String>) {
-        // --- Extract RunInformation ---
         val countingProtocol = data.firstNotNullOfOrNull { line ->
             countingProtocolRegex.find(line)?.groupValues?.get(1)?.toIntOrNull()
         }
@@ -128,31 +133,12 @@ class SamplesController(
             position = chunks[1],
             ccpm1 = chunks[2].toInt(),
             ccpm1Percentage = chunks[3].toDouble(),
-            type = handleType(id)
+            type = controlCurveHandler.resolveType(id)
         )
     } catch (e: Exception) {
         println("Parse error: $chunks")
         e.printStackTrace()
         null
-    }
-
-    /**
-     * Dynamically determines sample type based on current Settings.
-     */
-    private fun handleType(id: Int): Sample.Type {
-        val settings = settingsController.settingsProperty.get()
-        val curve = settings.curve
-
-        val totalEnd = curve.totalCount - 1
-        val nsbEnd = totalEnd + curve.nsbCount
-        val zeroEnd = nsbEnd + curve.zeroCount
-
-        return when (id) {
-            in 0..totalEnd -> Sample.Type.T
-            in (totalEnd + 1)..nsbEnd -> Sample.Type.N
-            in (nsbEnd + 1)..zeroEnd -> Sample.Type.O
-            else -> Sample.Type.S
-        }
     }
 
     companion object {

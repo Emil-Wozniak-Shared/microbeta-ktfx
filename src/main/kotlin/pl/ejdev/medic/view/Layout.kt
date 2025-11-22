@@ -6,6 +6,7 @@ import javafx.geometry.Pos
 import javafx.scene.layout.*
 import ktfx.coroutines.onAction
 import ktfx.layouts.*
+import pl.ejdev.medic.BuildInfo
 import pl.ejdev.medic.utils.classes
 
 private const val HOME = "Home"
@@ -52,7 +53,7 @@ private fun sideNav(contentArea: StackPane): VBox = vbox {
 private fun topBar(): HBox = hbox {
     classes(Style.TOP_BAR)
     vbox {
-        label(MODERN_JAVA_FX_APP) {
+        label("${BuildInfo.name.replaceFirstChar { it.uppercase() }} v. ${BuildInfo.version}") {
             classes(Style.TOP_BAR_TITLE)
         }
     }

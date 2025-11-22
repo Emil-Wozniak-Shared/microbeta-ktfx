@@ -9,11 +9,14 @@ import javafx.scene.control.cell.PropertyValueFactory
 import javafx.scene.layout.HBox
 import javafx.scene.layout.Priority
 import javafx.scene.layout.VBox
-import ktfx.layouts.KtfxLayoutDslMarker
+import javafx.scene.paint.Color
 import ktfx.layouts.tableView
 import org.koin.java.KoinJavaComponent.inject
 import pl.ejdev.medic.controller.SamplesController
 import pl.ejdev.medic.model.Sample
+import pl.ejdev.medic.model.Sample.Type
+import pl.ejdev.medic.service.ControlCurveHandler
+import pl.ejdev.medic.utils.fxStyle
 import pl.ejdev.medic.utils.tableColumn
 
 private const val ID = "ID"
@@ -24,6 +27,7 @@ private const val TYPE = "Type"
 
 fun samplesTable(): TableView<Sample> {
     val samplesController: SamplesController by inject(SamplesController::class.java)
+    val controlCurveHandler: ControlCurveHandler by inject(ControlCurveHandler::class.java)
 
     return tableView(samplesController.samples) {
         VBox.setVgrow(this, Priority.ALWAYS)
@@ -32,7 +36,7 @@ fun samplesTable(): TableView<Sample> {
         prefWidth = 800.0
         isEditable = true // ✅ Allow editing
 
-        val typeOptions = FXCollections.observableArrayList(*Sample.Type.entries.toTypedArray())
+        val typeOptions = FXCollections.observableArrayList(*Type.entries.toTypedArray())
 
         items = samplesController.samples
         columns.addAll(
@@ -40,36 +44,68 @@ fun samplesTable(): TableView<Sample> {
             tableColumn<Sample, String>(POSITION, Sample.POSITION),
             tableColumn<Sample, Int>(CPM, Sample.CPM),
             tableColumn<Sample, Double>(CPM_PERCENTAGE, Sample.CPM_PERCENTAGE),
-            tableColumn<Sample, Sample.Type>(TYPE, Sample.TYPE) { sampleConfiguration(this@tableColumn, typeOptions, this@tableView) }
+            tableColumn<Sample, Type>(TYPE, Sample.TYPE) {
+                sampleConfiguration(
+                    this@tableColumn,
+                    typeOptions,
+                    this@tableView,
+                    controlCurveHandler
+                )
+            }
         )
     }
 }
 
 private fun sampleConfiguration(
-    column: TableColumn<Sample, Sample.Type>,
-    typeOptions: ObservableList<Sample.Type>,
-    view: TableView<Sample>
+    column: TableColumn<Sample, Type>,
+    typeOptions: ObservableList<Type>,
+    view: TableView<Sample>,
+    controlCurveHandler: ControlCurveHandler,
 ) {
     column.cellValueFactory = PropertyValueFactory(Sample.TYPE)
     column.cellFactory = ComboBoxTableCell.forTableColumn(typeOptions)
 
     column.setCellFactory {
-        object : ComboBoxTableCell<Sample, Sample.Type>(typeOptions) {
-            override fun updateItem(item: Sample.Type?, empty: Boolean) {
+        object : ComboBoxTableCell<Sample, Type>(typeOptions) {
+            override fun updateItem(item: Type?, empty: Boolean) {
                 super.updateItem(item, empty)
                 if (empty || item == null) {
                     text = ""
                     style = ""
                     return
                 }
-
-                text = item.value
+                val rowIndex = tableRow.index
+                text = controlCurveHandler.resolveType(rowIndex, item)
                 style = when (item) {
-                    Sample.Type.T -> "-fx-background-color: lightgreen; -fx-text-fill: black;"
-                    Sample.Type.N -> "-fx-background-color: lightblue; -fx-text-fill: black;"
-                    Sample.Type.O -> "-fx-background-color: lightyellow; -fx-text-fill: black;"
-                    Sample.Type.S -> "-fx-background-color: darkgray; -fx-text-fill: white;"
-                    Sample.Type.X -> "-fx-background-color: red; -fx-text-fill: white;"
+                    Type.T -> fxStyle {
+                        `background-color`(Color.LIGHTGREEN)
+                        `text-fill`(Color.BLACK)
+                    }
+
+                    Type.N -> fxStyle {
+                        `background-color`(Color.LIGHTBLUE)
+                        `text-fill`(Color.BLACK)
+                    }
+
+                    Type.O -> fxStyle {
+                        `background-color`(Color.LIGHTYELLOW)
+                        `text-fill`(Color.BLACK)
+                    }
+
+                    Type.C -> fxStyle {
+                        `background-color`(Color.VIOLET)
+                        `text-fill`(Color.BLACK)
+                    }
+
+                    Type.S -> fxStyle {
+                        `background-color`(Color.DARKGRAY)
+                        `text-fill`(Color.BLACK)
+                    }
+
+                    Type.X -> fxStyle {
+                        `background-color`(Color.RED)
+                        `text-fill`(Color.BLACK)
+                    }
                 }
             }
         }
