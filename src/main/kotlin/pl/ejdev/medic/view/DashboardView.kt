@@ -17,9 +17,9 @@ import pl.ejdev.medic.controller.SamplesController
 import pl.ejdev.medic.model.RunInformation
 import pl.ejdev.medic.model.Sample
 import pl.ejdev.medic.model.xlsx.CreateXlsxCommand
+import pl.ejdev.medic.service.ControlCurveHandler
 import pl.ejdev.medic.service.XslxService
 import pl.ejdev.medic.utils.classes
-import pl.ejdev.medic.utils.listenText
 import java.io.File
 
 private const val UPLOAD = "Upload"
@@ -36,15 +36,13 @@ fun dashboardView() = stackPane {
 //            textField { listenText { label.text = it } }
 //            addChild(label)
             button("Save XSLX") {
+                isDisable = samplesController.isNotEmpty()
                 onAction {
                     val fileName = "file.xlsx"
                     val userHome = System.getProperty("user.home")
                     val outputFile = File(userHome, fileName)
                     outputFile.parentFile?.mkdirs()
                     samplesController.runInformation.get()
-                    val samples = samplesController.samples
-                        .filter { it.type != Sample.Type.S }
-                        .toList()
                     val hormone = "Kortyzol"
                     val date = "2019-01-08"
                     val subject = "Owce"
@@ -52,24 +50,7 @@ fun dashboardView() = stackPane {
                         .map { it }
                         .toList()
 
-                    val standardPoints: List<List<String>> = listOf(
-                        // row, F_col_value, G_col_cpm, point_number
-                        listOf("1.25", "412", "4"),
-                        listOf("1.25", "390", "4"),
-                        listOf("2.5", "378", "5"),
-                        listOf("2.5", "352", "5"),
-                        listOf("5.0", "322", "6"),
-                        listOf("5.0", "316", "6"),
-                        listOf("10", "225", "7"),
-                        listOf("10", "249", "7"),
-                        listOf("20", "174", "1"),
-                        listOf("40", "102", "2"),
-                        listOf("40", "116", "2"),
-                        listOf("80", "74", "3"),
-                        listOf("80", "65", "3"),
-                    )
-
-                    val command = CreateXlsxCommand(hormone, date, subject, initialData, standardPoints)
+                    val command = CreateXlsxCommand(hormone, date, subject, initialData)
                     xslxService.generate(mainController.primaryStage(), command)
                     this@hbox.addChild(Label("Saved!"))
                     println("Workbook saved")
@@ -80,7 +61,9 @@ fun dashboardView() = stackPane {
             uploadFileButton(
                 label = UPLOAD,
                 extensions = arrayOf(Extension.TXT),
-                successAction = samplesController::bindData
+                successAction = {
+                    samplesController.bindData(it)
+                }
             )
         )
         hbox(20.0) {

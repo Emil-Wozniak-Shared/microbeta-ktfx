@@ -6,6 +6,5 @@ data class CreateXlsxCommand(
     val hormone: String,
     val date: String,
     val subject: String,
-    val samples: List<Sample>,
-    val standardPoints: List<List<String>>
+    val samples: List<Sample>
 )

@@ -1,6 +1,5 @@
 package pl.ejdev.medic.controller
 
-import com.almasb.fxgl.core.reflect.ReflectionUtils.inject
 import javafx.beans.property.ObjectProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
@@ -46,6 +45,8 @@ class SamplesController() {
         println("Parsed ${parsed.size} samples")
         _samples.setAll(parsed)
     }
+
+    fun isNotEmpty() = _samples.isNotEmpty()
 
     private fun extractRunInformation(data: List<String>) {
         val countingProtocol = data.firstNotNullOfOrNull { line ->

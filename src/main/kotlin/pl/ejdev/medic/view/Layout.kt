@@ -12,7 +12,6 @@ import pl.ejdev.medic.utils.classes
 private const val HOME = "Home"
 private const val SETTINGS = "Settings"
 private const val ABOUT = "About"
-private const val MODERN_JAVA_FX_APP = "Modern JavaFX App"
 
 fun layout(): BorderPane {
     val contentArea = stackPane {

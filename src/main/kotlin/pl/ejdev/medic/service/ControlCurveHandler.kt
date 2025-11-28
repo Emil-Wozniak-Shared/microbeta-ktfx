@@ -46,7 +46,7 @@ class ControlCurveHandler() {
         }
     }
 
-    private fun calibrations(): Pair<Settings.Curve, List<String>> {
+    fun calibrations(): Pair<Settings.Curve, List<String>> {
         val settings: Settings = settingsController.settingsProperty.get()
         val curve = settings.curve
         val repeats = curve.calibration.repeats

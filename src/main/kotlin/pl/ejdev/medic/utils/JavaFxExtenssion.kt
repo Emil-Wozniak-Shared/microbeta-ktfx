@@ -1,5 +1,3 @@
-@file:Suppress("FunctionName")
-
 package pl.ejdev.medic.utils
 
 import javafx.scene.Node
@@ -29,33 +27,61 @@ inline fun <reified SOURCE, reified PROP> tableColumn(
     factory(propName)
 }
 
+sealed interface FxSize
+
+data class PixelSize(val value: Int) : FxSize
+
+val Int.px: PixelSize
+    get() = PixelSize(this)
+
+enum class FontWeight {
+    BOLD
+}
+
+private const val FONT_SIZE = "font-size"
+private const val HASH = "#"
+
+@Suppress("FunctionName")
 class StyleComposer {
     private var style = ""
+
     fun `background-color`(value: Color) {
-        style += "-fx-background-color: ${value.toHexString()};"
+        "background-color" eq value.toHexString()
     }
 
     fun `text-fill`(value: Color) {
-        style += "-fx-text-fill: ${value.toHexString()};"
+        "text-fill" eq value.toHexString()
     }
 
-    private fun format(`val`: Double): String {
-        val `in` = Integer.toHexString((`val` * 255).roundToInt())
-        return if (`in`.length == 1) "0$`in`" else `in`
+    fun `font-size`(value: FxSize) {
+        style += when (value) {
+            is PixelSize -> FONT_SIZE eq "${value.value}$STYLE_SEPARATOR"
+        }
     }
 
-    fun Color.toHexString(): String = buildString {
-        append("#")
-        append(format(red))
-        append(format(green))
-        append(format(blue))
-        append(format(opacity))
-    }.uppercase()
+    fun `font-weight`(weight: FontWeight) {
+        "font-weight" eq weight.name.lowercase()
+    }
+
+    private infix fun String.eq(value: String) {
+        this@StyleComposer.style += "$FX_PREFIX$this: $value$STYLE_SEPARATOR"
+    }
+
+    private fun format(value: Double): String {
+        val hexText = Integer.toHexString((value * 255).roundToInt())
+        return if (hexText.length == 1) "0$hexText" else hexText
+    }
+
+    private fun Color.toHexString(): String =
+        "$HASH${format(red)}${format(green)}${format(blue)}${format(opacity)}"
+            .uppercase()
 
     fun build() = style
+
+    private companion object {
+        const val FX_PREFIX = "-fx-"
+        const val STYLE_SEPARATOR = ";"
+    }
 }
 
-fun fxStyle(compose: StyleComposer.() -> Unit): String {
-
-    return StyleComposer().apply(compose).build()
-}
+fun fxStyle(compose: StyleComposer.() -> Unit): String = StyleComposer().apply(compose).build()
