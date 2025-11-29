@@ -5,12 +5,9 @@ import pl.ejdev.medic.controller.SettingsController
 import pl.ejdev.medic.model.Sample
 import pl.ejdev.medic.model.Settings
 
-class ControlCurveHandler() {
+class ControlCurveProvider {
     private val settingsController: SettingsController by inject(SettingsController::class.java)
 
-    /**
-     * Dynamically determines sample type based on current Settings.
-     */
     fun resolveType(id: Int): Sample.Type {
         val (curve, values) = calibrations()
         val totalEnd = curve.totalCount - 1

@@ -3,7 +3,6 @@ package pl.ejdev.medic
 import javafx.application.Application
 import javafx.stage.Stage
 import ktfx.layouts.scene
-import org.koin.core.context.GlobalContext.startKoin
 import org.koin.java.KoinJavaComponent.inject
 import pl.ejdev.medic.controller.MainController
 import pl.ejdev.medic.view.Style
@@ -13,7 +12,7 @@ private const val TITLE = "Medic App"
 
 class MedicApplication() : Application() {
     override fun init() {
-        startKoin { modules(appModule) }
+        KoinConfig.init()
     }
 
     private val controller: MainController by inject(MainController::class.java)

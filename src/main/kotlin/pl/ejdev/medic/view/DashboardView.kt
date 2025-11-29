@@ -9,59 +9,48 @@ import javafx.scene.layout.VBox
 import ktfx.coroutines.onAction
 import ktfx.layouts.*
 import org.koin.java.KoinJavaComponent.inject
+import pl.ejdev.medic.architecture.xlsx.dto.WriteXlsxCommand
+import pl.ejdev.medic.architecture.xlsx.usecase.write.WriteXlsxUseCase
 import pl.ejdev.medic.components.Extension
 import pl.ejdev.medic.components.samplesTable
 import pl.ejdev.medic.components.uploadFileButton
-import pl.ejdev.medic.controller.MainController
 import pl.ejdev.medic.controller.SamplesController
 import pl.ejdev.medic.model.RunInformation
-import pl.ejdev.medic.model.Sample
-import pl.ejdev.medic.model.xlsx.CreateXlsxCommand
-import pl.ejdev.medic.service.ControlCurveHandler
-import pl.ejdev.medic.service.XslxService
 import pl.ejdev.medic.utils.classes
 import java.io.File
 
 private const val UPLOAD = "Upload"
+private const val SAVE_XSLX = "Save XSLX"
+
+private val savedLabel = Label("")
 
 fun dashboardView() = stackPane {
-    val mainController: MainController by inject(MainController::class.java)
     val samplesController: SamplesController by inject(SamplesController::class.java)
-    val xslxService: XslxService by inject(XslxService::class.java)
+    val writeXlsxUseCase: WriteXlsxUseCase by inject(WriteXlsxUseCase::class.java)
 
     classes(Style.MAIN_CONTENT)
     vbox {
         hbox {
-//            val label = Label("")
-//            textField { listenText { label.text = it } }
-//            addChild(label)
-            button("Save XSLX") {
+            button(SAVE_XSLX) {
                 isDisable = samplesController.isNotEmpty()
                 onAction {
-                    val fileName = "file.xlsx"
-                    val userHome = System.getProperty("user.home")
-                    val outputFile = File(userHome, fileName)
-                    outputFile.parentFile?.mkdirs()
-                    samplesController.runInformation.get()
-                    val hormone = "Kortyzol"
-                    val date = "2019-01-08"
-                    val subject = "Owce"
-                    val initialData: List<Sample> = samplesController.samples
-                        .map { it }
-                        .toList()
-
-                    val command = CreateXlsxCommand(hormone, date, subject, initialData)
-                    xslxService.generate(mainController.primaryStage(), command)
-                    this@hbox.addChild(Label("Saved!"))
-                    println("Workbook saved")
+                    WriteXlsxCommand
+                        .from(
+                            runInformation = samplesController.runInformation.get()!!,
+                            samples = samplesController.samples.map { it }.toList()
+                        )
+                        .let { writeXlsxUseCase.handle(it) }
+                    savedLabel.text = "Saved!"
                 }
             }
+            addChild(savedLabel)
         }
         addChild(
             uploadFileButton(
                 label = UPLOAD,
                 extensions = arrayOf(Extension.TXT),
                 successAction = {
+                    savedLabel.text = ""
                     samplesController.bindData(it)
                 }
             )

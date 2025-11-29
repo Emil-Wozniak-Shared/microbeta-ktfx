@@ -15,7 +15,7 @@ import org.koin.java.KoinJavaComponent.inject
 import pl.ejdev.medic.controller.SamplesController
 import pl.ejdev.medic.model.Sample
 import pl.ejdev.medic.model.Sample.Type
-import pl.ejdev.medic.service.ControlCurveHandler
+import pl.ejdev.medic.service.ControlCurveProvider
 import pl.ejdev.medic.utils.fxStyle
 import pl.ejdev.medic.utils.tableColumn
 
@@ -27,7 +27,7 @@ private const val TYPE = "Type"
 
 fun samplesTable(): TableView<Sample> {
     val samplesController: SamplesController by inject(SamplesController::class.java)
-    val controlCurveHandler: ControlCurveHandler by inject(ControlCurveHandler::class.java)
+    val controlCurveProvider: ControlCurveProvider by inject(ControlCurveProvider::class.java)
 
     return tableView(samplesController.samples) {
         VBox.setVgrow(this, Priority.ALWAYS)
@@ -49,7 +49,7 @@ fun samplesTable(): TableView<Sample> {
                     this@tableColumn,
                     typeOptions,
                     this@tableView,
-                    controlCurveHandler
+                    controlCurveProvider
                 )
             }
         )
@@ -60,7 +60,7 @@ private fun sampleConfiguration(
     column: TableColumn<Sample, Type>,
     typeOptions: ObservableList<Type>,
     view: TableView<Sample>,
-    controlCurveHandler: ControlCurveHandler,
+    controlCurveProvider: ControlCurveProvider,
 ) {
     column.cellValueFactory = PropertyValueFactory(Sample.TYPE)
     column.cellFactory = ComboBoxTableCell.forTableColumn(typeOptions)
@@ -75,7 +75,7 @@ private fun sampleConfiguration(
                     return
                 }
                 val rowIndex = tableRow.index
-                text = controlCurveHandler.resolveType(rowIndex, item)
+                text = controlCurveProvider.resolveType(rowIndex, item)
                 style = when (item) {
                     Type.T -> fxStyle {
                         `background-color`(Color.LIGHTGREEN)

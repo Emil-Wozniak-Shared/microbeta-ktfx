@@ -5,19 +5,17 @@ import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
 import javafx.collections.FXCollections.observableArrayList
 import javafx.collections.ObservableList
-import org.koin.java.KoinJavaComponent.inject
 import pl.ejdev.medic.model.Plate
 import pl.ejdev.medic.model.RunInformation
 import pl.ejdev.medic.model.Sample
-import pl.ejdev.medic.service.ControlCurveHandler
+import pl.ejdev.medic.service.ControlCurveProvider
 
 private const val SAMPLE_START_PATTERN = "\tUnk"
 private const val TABULATOR = "\t"
 
-class SamplesController() {
-    private val settingsController: SettingsController by inject(SettingsController::class.java)
-    private val controlCurveHandler: ControlCurveHandler by inject(ControlCurveHandler::class.java)
-
+class SamplesController(
+    private val controlCurveProvider: ControlCurveProvider
+) {
     private val _samples = observableArrayList<Sample>()
     private val _runInformation: ObjectProperty<RunInformation?> = SimpleObjectProperty(null)
     private val _plates: ObservableList<Plate> = FXCollections.observableArrayList()
@@ -60,12 +58,16 @@ class SamplesController() {
         val name = data.firstNotNullOfOrNull { line ->
             nameRegex.find(line)?.groupValues?.get(1)
         }
+        val date = data.firstNotNullOfOrNull { line ->
+            dateRegex.find(line)?.groupValues?.get(0)
+        }
 
-        if (countingProtocol != null && normalizationProtocol != null && name != null) {
+        if (countingProtocol != null && normalizationProtocol != null && name != null && date != null) {
             currentRunInformation = RunInformation(
                 countingProtocolNo = countingProtocol,
                 normalizationProtocolNo = normalizationProtocol,
-                name = name
+                name = name,
+                date = date
             )
         }
     }
@@ -134,7 +136,7 @@ class SamplesController() {
             position = chunks[1],
             ccpm1 = chunks[2].toInt(),
             ccpm1Percentage = chunks[3].toDouble(),
-            type = controlCurveHandler.resolveType(id)
+            type = controlCurveProvider.resolveType(id)
         )
     } catch (e: Exception) {
         println("Parse error: $chunks")
@@ -148,6 +150,7 @@ class SamplesController() {
         val countingProtocolRegex = """Counting protocol no:\s*(\d+)""".toRegex()
         val normalizationProtocolRegex = """CPM normalization protocol no:\s*(\d+)""".toRegex()
         val nameRegex = """Name:\s*(.+)""".toRegex()
+        val dateRegex = """\b\d{1,2}-[A-Za-z]{3}-\d{4}\b""".toRegex()
         val WHITE_CHAR_REGEX = Regex("\\s+")
     }
 }
